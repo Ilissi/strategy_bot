@@ -5,61 +5,58 @@ const Markup = require('telegraf/markup')
 
 require('dotenv').config()
 
-
+const userController = require('../strategy/contoller/user.Controller')
 const contactDataWizard = require('./scenes/addStrategy').contactDataWizard
 const editDataWizard = require('./scenes/editStrategy').editDataWizard
-
+const gradeDataWizard = require('./scenes/addGrade').gradeDataWizard
+const sendAdmin = require('./utils/generate_message')
 
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
-const stage = new Stage([contactDataWizard, editDataWizard])
+const stage = new Stage([contactDataWizard, editDataWizard, gradeDataWizard])
 bot.use(session())
 bot.use(stage.middleware())
 
-bot.start((ctx) => {
+
+
+bot.start(async (ctx) => {
+    let check_user = await userController.lookUpUser(ctx.message.chat.id);
+    let check_status = await userController.checkStatus(ctx.message.chat.id, 'unregister');
+    let check_block = await userController.checkStatus(ctx.message.chat.id, 'Отклонить')
     let userFirstName = ctx.message.from.first_name
-    let message = ` Hello master ${userFirstName}, i am OCR bot your humble servant. \n
-    Where would you like to extract text from ?`
-
-    let options = Markup.inlineKeyboard([
-        Markup.callbackButton('Extract from 🖼️', 'extractFromImage'),
-        Markup.callbackButton('Extract from 🎬', 'extractFromVideo'),
-    ]).extra()
-    ctx.reply(message, options)
+    if (check_user.length == 0){
+        await sendAdmin.registerUser(ctx)
+        ctx.reply(`Привет, ${userFirstName}, дождись подтверждения регистрации у администратора! `)
+    }
+    else if(check_block.length == 1){
+        ctx.reply(`Привет, ${userFirstName}. Администратор октлонил Вашу регистрацию. `)
+    }
+    else if (check_status.length > 0){
+        ctx.reply(`Привет, ${userFirstName}, администратор еще не подтвердил твою регистрацию! `)
+    }
+    else {
+        ctx.reply(`С возвращением, ${userFirstName}!`)
+    }
 })
-
 
 
 bot.command('add', ctx => {
     ctx.scene.enter('add_strategy');
 });
 
-bot.command('edit', ctx => ctx.reply('Что нужно изменить в стратегии?',     Markup.inlineKeyboard([
-    [Markup.callbackButton('Внесение изменений по SL', 'edit_sl')],
-    [Markup.callbackButton('Внесение изменений по TP', 'edit_tp')],
-    [Markup.callbackButton('Усреднить цену по идее', 'medium')],
-    [Markup.callbackButton('Закрыть идею при или до наступления TP/SL', 'close')]
-]).extra()));
 
-bot.action('edit_sl', ctx => {
-    ctx.scene.enter('edit_sl');
+bot.action(/updateStatus (.+)/, ctx => {
+    let message = ctx.callbackQuery.data;
+    sendAdmin.updateUser(ctx, message);
 });
 
-bot.action('edit_tp', ctx => {
-    ctx.scene.enter('edit_tp');
+bot.action(/grade (.+)/, ctx => {
+    ctx.scene.enter('add_grade');
 });
 
-bot.action('medium', ctx => {
-    ctx.scene.enter('medium');
-});
 
-bot.action('close', ctx => {
-    ctx.scene.enter('close');
-});
 
-bot.command('edit_strategy', ctx => {
-    ctx.scene.enter('edit_strategy')
-});
+
 
 
 bot.launch()

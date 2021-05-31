@@ -2,6 +2,9 @@ const WizardScene = require('telegraf/scenes/wizard')
 
 const strategyController = require('../contoller/strategy.Controller')
 const Keyboards = require('../keyboards/keyboards')
+const messageFormat = require('../utils/message_format')
+const generateMessage = require('../utils/generate_message')
+
 
 
 const contactDataWizard = new WizardScene(
@@ -13,12 +16,22 @@ const contactDataWizard = new WizardScene(
     },
     (ctx) => {
         ctx.deleteMessage()
-        ctx.wizard.state.contactData.type = ctx.callbackQuery.data;
-        ctx.reply('Какой источник стратегии?', Keyboards.strategySource());
-        return ctx.wizard.next();
+        if (typeof ctx.message == 'object'){
+            ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши /add еще раз!')
+            return ctx.scene.leave();
+        }
+        else {
+            ctx.wizard.state.contactData.type = ctx.callbackQuery.data;
+            ctx.reply('Какой источник стратегии?', Keyboards.strategySource());
+            return ctx.wizard.next();
+        }
     },
     (ctx) => {
-        if (ctx.callbackQuery.data == 'Платный источник') {
+        if (typeof ctx.message == 'object'){
+            ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши /add еще раз!')
+            return ctx.scene.leave();
+        }
+        else if (ctx.callbackQuery.data == 'Платный источник') {
             ctx.deleteMessage()
             ctx.reply('Введите ссылку на платный источник:')
 
@@ -37,19 +50,25 @@ const contactDataWizard = new WizardScene(
         else {
             ctx.deleteMessage()
         }
-        ctx.reply('Введите название пары:')
+        ctx.reply('Тикер:')
         return ctx.wizard.next();
     },
     (ctx) => {
         ctx.wizard.state.contactData.ticker = ctx.message.text;
-        ctx.reply('Какой buy ticker?', Keyboards.getOrder());
+        ctx.reply('Какое действие?', Keyboards.getOrder());
         return ctx.wizard.next();
     },
     (ctx) => {
         ctx.deleteMessage()
-        ctx.wizard.state.contactData.order = ctx.callbackQuery.data;
-        ctx.reply('Введите цену входа:');
-        return ctx.wizard.next();
+        if (typeof ctx.message == 'object'){
+            ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши /add еще раз!')
+            return ctx.scene.leave();
+        }
+        else {
+            ctx.wizard.state.contactData.order = ctx.callbackQuery.data;
+            ctx.reply('Введите цену входа:');
+            return ctx.wizard.next();
+        }
     },
     (ctx) => {
         ctx.wizard.state.contactData.price_enter = ctx.message.text;
@@ -67,29 +86,67 @@ const contactDataWizard = new WizardScene(
         return ctx.wizard.next();
     },
     (ctx) => {
-        if (ctx.wizard.state.contactData.SL == undefined){
         ctx.wizard.state.contactData.SL = ctx.message.text;
-        ctx.reply('Введите комментарий:');
+        ctx.reply('Срок:');
+        return ctx.wizard.next();
+    },
+    (ctx) => {
+        ctx.wizard.state.contactData.time = ctx.message.text;
+        ctx.reply('Оцените риск стратегии:', Keyboards.riskKeyboard())
+        return ctx.wizard.next();
+    },
+    (ctx) => {
+        if (ctx.wizard.state.contactData.risk == undefined){
+            ctx.deleteMessage()
+            ctx.wizard.state.contactData.risk = ctx.callbackQuery.data;
+            ctx.reply('Введите комментарий:');
         }
         else {
             ctx.reply('Введите комментарий:');
         }
         return ctx.wizard.next();
     },
-    async (ctx) => {
-        if (ctx.message.text.length > 30){
-            console.log(ctx.message.text)
+    (ctx) => {
+        if (ctx.message.text.length > 30) {
             ctx.wizard.state.contactData.user_id = ctx.message.chat.id;
             ctx.wizard.state.contactData.comment = ctx.message.text;
-            await strategyController.createStrategy(ctx.wizard.state.contactData);
-            ctx.reply('Коментарий успешно сохранен')
-        }
-        else {
-            ctx.reply('Длинна коментария меньше 30 символов, попробуйте еще раз');
+            ctx.reply('Подтвердите отправку идеи:')
+            let messageSend = messageFormat.generate_message(ctx.message.chat.username, ctx.wizard.state.contactData.ticker, ctx.wizard.state.contactData.order,
+                ctx.wizard.state.contactData.percent, ctx.wizard.state.contactData.price_enter, ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL,
+                ctx.wizard.state.contactData.time, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.risk,
+                ctx.wizard.state.contactData.comment)
+            ctx.reply(messageSend, Keyboards.acceptIdea())
+            return ctx.wizard.next();
+        } else {
+            ctx.reply('Длинна комментария меньше 30 символов, попробуйте еще раз');
             ctx.wizard.back();  // Set the listener to the previous function
             return ctx.wizard.steps[ctx.wizard.cursor](ctx);
         }
-        return ctx.scene.leave();
+    },
+        async (ctx) => {
+            ctx.deleteMessage()
+            if (typeof ctx.message == 'object'){
+                ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши /add еще раз!')
+        }
+            else if(ctx.callbackQuery.data == 'ОК'){
+                let response = await strategyController.createStrategy(ctx.wizard.state.contactData);
+
+                if (response == 'undefined'){
+                    ctx.reply('Ошибка формата текста! Сообщение не отправлено!')
+                }
+                else {
+                    let messageSend = messageFormat.generate_message(ctx.callbackQuery.from.username, ctx.wizard.state.contactData.ticker, ctx.wizard.state.contactData.order,
+                        ctx.wizard.state.contactData.percent, ctx.wizard.state.contactData.price_enter, ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL,
+                        ctx.wizard.state.contactData.time, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.risk,
+                        ctx.wizard.state.contactData.comment)
+                    await generateMessage.sendIdea(ctx, messageSend, response[0].id, ctx.wizard.state.contactData.ticker)
+                    ctx.reply('Идея отправлена риск-менеджерам.')
+                }
+            }
+            else if(ctx.callbackQuery.data == 'ОТМЕНА'){
+                ctx.reply('Отправка идеи отменена.')
+            }
+            return ctx.scene.leave();
     },
 );
 

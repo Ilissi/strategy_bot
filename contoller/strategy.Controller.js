@@ -3,13 +3,14 @@ const db = require('../db')
 class strategyController {
 
     async createStrategy(call_json) {
-        const response = await db.query('INSERT INTO strategy(type, source, ticker, order_type, entry_price, percent, ' +
-        'TP, SL, id_telegram, comment) '
-        + 'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *', Object.values(call_json), (err, res) => {
-        if (err) {
-            throw err
-        }});
-    return response
+        let response;
+        try {
+        response = await db.query('INSERT INTO strategy' +
+            '(type, source, ticker, order_type, entry_price, percent, TP, SL, timemodifier, risk, id_telegram, comment) ' +
+            'VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *', Object.values(call_json));
+        return response.rows;
+    } catch (error) {
+        }
     }
 
     async getStrategyByTicker(ticker) {

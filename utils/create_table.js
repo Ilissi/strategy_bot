@@ -13,17 +13,19 @@ async function createDatabase(){
                 console.log(err, res);
             });
         pool.query("CREATE TABLE IF NOT EXISTS strategy ( " +
-            "id SERIAL PRIMARY KEY, " +
+            "id uuid PRIMARY KEY DEFAULT gen_random_uuid(), " +
             "type VARCHAR(255) NOT NULL, " +
             "source VARCHAR(255) NOT NULL, " +
             "ticker VARCHAR(255) NOT NULL, " +
             "order_type VARCHAR(255) NOT NULL, " +
             "entry_price DECIMAL NOT NULL, " +
-            "percent INTEGER NOT NULL, " +
+            "percent DECIMAL NOT NULL, " +
             "TP DECIMAL NOT NULL, " +
             "SL DECIMAL NOT NULL,  " +
             "id_telegram INTEGER NOT NULL," +
             "comment VARCHAR(255) NOT NULL, " +
+            "timemodifier VARCHAR(255) NOT NULL, "+
+            "risk INTEGER NOT NULL, "+
             "status VARCHAR(255));",
             (err, res) => {
                 console.log(err, res);
@@ -34,10 +36,10 @@ async function createDatabase(){
             "id SERIAL PRIMARY KEY, " +
             "nickname VARCHAR(255)," +
             "ticker VARCHAR(255), " +
-            "first_criterion VARCHAR(255) NOT NULL, " +
-            "second_criterion VARCHAR(255) NOT NULL, " +
-            "third_criterion VARCHAR(255) NOT NULL, " +
-            "fourth_criterion VARCHAR(255) NOT NULL, " +
+            "first_criterion INTEGER NOT NULL, " +
+            "second_criterion INTEGER NOT NULL, " +
+            "third_criterion INTEGER NOT NULL, " +
+            "fourth_criterion INTEGER NOT NULL, " +
             "comment VARCHAR(255) NOT NULL," +
             "user_id INTEGER REFERENCES users(id_telegram) ON DELETE CASCADE," +
             "strategy_id INTEGER REFERENCES strategy(id) ON DELETE CASCADE);",
