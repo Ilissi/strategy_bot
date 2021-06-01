@@ -15,4 +15,5 @@ async function USAStockGetName(ID) { //получаем имя бумаги
     }
 }
 
+
 module.exports.USAStockGetName = USAStockGetName

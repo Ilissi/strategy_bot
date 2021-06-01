@@ -44,11 +44,11 @@ class Keyboards {
 
     riskKeyboard(){
         return Markup.inlineKeyboard([
-            [Markup.callbackButton('5/5', '5'),
-            Markup.callbackButton('4/5', '4')],
-            [Markup.callbackButton('3/5', '3'),
-            Markup.callbackButton('2/5', '2')],
-            [Markup.callbackButton('1/5', '1')]]).extra();
+            [Markup.callbackButton('4', '4'),
+            Markup.callbackButton('5', '5')],
+            [Markup.callbackButton('2', '2'),
+            Markup.callbackButton('3', '3')],
+            [Markup.callbackButton('1', '1')]]).extra();
     }
 
     acceptGrade(uuid, ticker){
