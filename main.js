@@ -5,11 +5,11 @@ const Markup = require('telegraf/markup')
 
 require('dotenv').config()
 
-const userController = require('../contoller/user.Controller')
-const contactDataWizard = require('./scenes/addStrategy').contactDataWizard
-const editDataWizard = require('./scenes/editStrategy').editDataWizard
-const gradeDataWizard = require('./scenes/addGrade').gradeDataWizard
-const sendAdmin = require('./utils/generate_message')
+const userController = require('../root/strategy_bot/contoller/user.Controller')
+const contactDataWizard = require('./root/strategy_bot/scenes/addStrategy').contactDataWizard
+const editDataWizard = require('./root/strategy_bot/scenes/editStrategy').editDataWizard
+const gradeDataWizard = require('./root/strategy_bot/scenes/addGrade').gradeDataWizard
+const sendAdmin = require('./root/strategy_bot/utils/generate_message')
 
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
