@@ -1,10 +1,10 @@
 const Telegraf = require('telegraf')
-const userController = require('../contoller/user.Controller')
-const gradeController = require('../contoller/grade.Controller')
-const strategyController = require('../contoller/strategy.Controller')
-const Keyboards = require('../keyboards/keyboards')
-const messageFormat = require('../utils/message_format')
-const utils = require('../utils/message_format')
+const userController = require('/root/strategy_bot/contoller/user.Controller')
+const gradeController = require('/root/strategy_bot/contoller/grade.Controller')
+const strategyController = require('/root/strategy_bot/contoller/strategy.Controller')
+const Keyboards = require('/root/strategy_bot/keyboards/keyboards')
+const messageFormat = require('/root/strategy_bot/utils/message_format')
+const utils = require('/root/strategy_bot/utils/message_format')
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
 

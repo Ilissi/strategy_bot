@@ -1,6 +1,6 @@
 const db = require('../db')
 
-const userController = require('../contoller/user.Controller')
+const userController = require('/root/strategy_bot/contoller/user.Controller')
 
 class gradeController {
 
