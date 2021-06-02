@@ -37,11 +37,11 @@ function generateList(first_array, second_array) {
 }
 
 function generateFinishMessage(firstArray, secondArray) {
-    return `${firstArray}/${secondArray} риск-менеджеров оценили`
+    return `${firstArray}/${secondArray} риск-менеджеров оценили\n`
 }
 
 function generateTitle(){
-    return '1. Оценка по критерию @Драйверы к росту фундаментал@\n 2. Оценка по критерию @Точка входа по тех анализу@.\n 3. Оценка по критерию @Корректность типа стратегии@ \n 4. Общая оценка '
+    return '1. Драйверы к росту фундаментала.\n2. Точка входа по тех анализу.\n3. Корректность типа стратегии. \n4. Общая оценка.\n'
 }
 
 function generateString(username, firstCriterion, secondCriterion, thirdCriterion, summary, comment){
@@ -49,11 +49,11 @@ function generateString(username, firstCriterion, secondCriterion, thirdCriterio
 }
 
 function finishString(username, firstCriterion, secondCriterion, thirdCriterion, summary){
-    return ` @${username} | ${firstCriterion} | ${secondCriterion} | ${thirdCriterion} | ${summary} `
+    return `\n@${username} | ${firstCriterion} | ${secondCriterion} | ${thirdCriterion} | ${summary} `
 }
 
 function generateComment(username, comment){
-    return ` Комментарий @${username}: ${comment} `
+    return `\n${username}: \n${comment} `
 }
 
 module.exports = { generate_message, managerMessage, getTime, generateList, generateFinishMessage, generateTitle,

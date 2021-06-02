@@ -13,7 +13,7 @@ const gradeDataWizard = new WizardScene('add_grade', // first argument is Scene_
         ctx.wizard.state.contactData.userid = ctx.callbackQuery.from.id;
         let list_data = ctx.callbackQuery.data.split(' ');
         ctx.wizard.state.contactData.UUID = list_data[1];
-        ctx.reply('Оценка по критерию @Драйверы к росту фундаментал@:', Keyboards.insertGrade());
+        ctx.reply('Оцени драйверы к росту фундаментала:', Keyboards.insertGrade());
         return ctx.wizard.next();
     },
     (ctx) => {
@@ -24,7 +24,7 @@ const gradeDataWizard = new WizardScene('add_grade', // first argument is Scene_
         }
         else {
             ctx.wizard.state.contactData.first_criterion = ctx.callbackQuery.data;
-            ctx.reply('Оценка по критерию @Точка входа по тех анализу@:', Keyboards.insertGrade());
+            ctx.reply('Оцени точку входа по тех анализу:', Keyboards.insertGrade());
             return ctx.wizard.next();
         }
     },
@@ -36,7 +36,7 @@ const gradeDataWizard = new WizardScene('add_grade', // first argument is Scene_
         }
         else {
             ctx.wizard.state.contactData.second_criterion = ctx.callbackQuery.data;
-            ctx.reply('Оценка по критерию @Корректность типа стратегии@:', Keyboards.insertGrade());
+            ctx.reply('Оцени корректность типа стратегии:', Keyboards.insertGrade());
             return ctx.wizard.next();
         }
     },
