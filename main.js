@@ -5,7 +5,7 @@ const Markup = require('telegraf/markup')
 
 require('dotenv').config()
 
-const userController = require('../root/strategy_bot/contoller/user.Controller')
+const userController = require('/root/strategy_bot/contoller/user.Controller')
 const contactDataWizard = require('./root/strategy_bot/scenes/addStrategy').contactDataWizard
 const editDataWizard = require('./root/strategy_bot/scenes/editStrategy').editDataWizard
 const gradeDataWizard = require('./root/strategy_bot/scenes/addGrade').gradeDataWizard
