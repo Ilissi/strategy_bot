@@ -24,13 +24,8 @@ bot.start(async (ctx) => {
     let check_status = await userController.checkStatus(ctx.message.chat.id, 'unregister');
     let check_block = await userController.checkStatus(ctx.message.chat.id, 'Отклонить')
     let userFirstName = ctx.message.from.first_name
-    console.log(check_user)
-    console.log(check_status)
-    console.log(check_block)
-    console.log(userFirstName)
     if (check_user.length == 0){
         await generateMessage.registerUser(ctx)
-        console.log('+')
         ctx.reply(`Привет, ${userFirstName}, дождись подтверждения регистрации у администратора! `)
     }
     else if(check_block.length == 1){
