@@ -12,6 +12,7 @@ class strategyController {
             `VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, to_timestamp(${Date.now()} / 1000.0)) RETURNING *`, call_json);
         return response.rows;
     } catch (error) {
+            console.log(error)
         }
     }
 
@@ -22,6 +23,7 @@ class strategyController {
                 'TP, SL, id_telegram, comment FROM strategy WHERE ticker = $1', [ticker]);
             return response.rows;
         } catch (error) {
+            console.log(error)
             // handle error
             // do not throw anything
         }
@@ -34,6 +36,7 @@ class strategyController {
                 'TP, SL, risk, timemodifier, id_telegram, comment FROM strategy WHERE id = $1', [strategy_id]);
             return response.rows;
         } catch (error) {
+            console.log(error)
             // handle error
             // do not throw anything
         }
@@ -45,6 +48,7 @@ class strategyController {
             response = await db.query('UPDATE strategy SET approved = true WHERE id = $1 RETURNING id', [strategy_id]);
             return response.rows;
         } catch (error) {
+            console.log(error)
         }
     }
 
@@ -54,6 +58,7 @@ class strategyController {
             response = await db.query('SELECT id FROM strategy WHERE id = $1 AND approved = $2', [strategy_id, true]);
             return response.rows;
         }catch (error) {
+            console.log(error)
         }
     }
 
@@ -63,6 +68,7 @@ class strategyController {
             response = await db.query('UPDATE strategy SET status = $1 WHERE id = $2 RETURNING *', [status, strategy_id]);
             return response.rows;
         }catch (error) {
+            console.log(error)
         }
     }
 

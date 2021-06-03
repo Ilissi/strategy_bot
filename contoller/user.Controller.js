@@ -7,6 +7,7 @@ class userController {
             response = await db.query('SELECT * FROM users WHERE id_telegram = $1', [user_id]);
             return response.rows;
         } catch (error) {
+            console.log(error)
             // handle error
             // do not throw anything
         }
@@ -18,6 +19,7 @@ class userController {
             response = await db.query('SELECT * FROM users WHERE id_telegram = $1 AND permissions = $2', [user_id, permissions]);
             return response.rows;
         } catch (error) {
+            console.log(error)
             // handle error
             // do not throw anything
         }
@@ -29,6 +31,7 @@ class userController {
             response = await db.query('SELECT id_telegram FROM users WHERE permissions = $1', [position]);
             return response.rows;
         } catch (error) {
+            console.log(error)
         }
     }
 
@@ -39,6 +42,7 @@ class userController {
                 'VALUES($1, $2, $3) RETURNING *', [id_telegram, nickname, permissions]);
             return response.rows;
         } catch (error) {
+            console.log(error)
         }
     }
 
@@ -48,6 +52,7 @@ class userController {
             response = await db.query('UPDATE users SET permissions = $1 WHERE id_telegram = $2', [permissions, id_telegram]);
             return response.rows;
         } catch (error) {
+            console.log(error)
         }
     }
 
