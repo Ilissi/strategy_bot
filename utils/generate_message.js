@@ -18,7 +18,7 @@ const registerUser = async (ctx) => {
     console.log(admins)
 
     for (let i=0; i<admins.length; i++) {
-        bot.telegram.sendMessage(admins[i].id_telegram, `Привет! Новый пользователь пытается зарегистрироваться!\n` +
+        await bot.telegram.sendMessage(admins[i].id_telegram, `Привет! Новый пользователь пытается зарегистрироваться!\n` +
             `Для подтверждения регистрации пользователя @${username} нажмите кнопку!`, Keyboards.addUser(user_id));
     }
 };
@@ -29,11 +29,11 @@ const updateUser = async (ctx, message) => {
     let permissions = response[2]
     if (permissions == 'Отклонить'){
         await userController.updateStatus(user_id, permissions)
-        bot.telegram.sendMessage(user_id, 'Администратор отклонил Вашу регистрацию')
+        await bot.telegram.sendMessage(user_id, 'Администратор отклонил Вашу регистрацию')
     }
     else {
         await userController.updateStatus(user_id, permissions)
-        bot.telegram.sendMessage(user_id, `Администратор подтвердил Вашу регистрацию. Вы - ${permissions}.`)
+        await bot.telegram.sendMessage(user_id, `Администратор подтвердил Вашу регистрацию. Вы - ${permissions}.`)
     }
     ctx.deleteMessage()
     ctx.reply('Действие подтверждено!')

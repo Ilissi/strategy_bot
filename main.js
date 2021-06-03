@@ -30,6 +30,7 @@ bot.start(async (ctx) => {
     console.log(userFirstName)
     if (check_user.length == 0){
         await generateMessage.registerUser(ctx)
+        console.log('+')
         ctx.reply(`Привет, ${userFirstName}, дождись подтверждения регистрации у администратора! `)
     }
     else if(check_block.length == 1){
