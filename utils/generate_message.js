@@ -6,7 +6,7 @@ const Keyboards = require('/root/strategy_bot/keyboards/keyboards')
 const messageFormat = require('/root/strategy_bot/utils/message_format')
 const utils = require('/root/strategy_bot/utils/message_format')
 
-const bot = new Telegraf('1765081269:AAGk4jJlz873-zOWwDlGD4AE6lKaMzoP2qU\n')
+const bot = new Telegraf('1765081269:AAGk4jJlz873-zOWwDlGD4AE6lKaMzoP2qU')
 require('dotenv').config()
 
 
