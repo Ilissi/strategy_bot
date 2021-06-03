@@ -18,6 +18,7 @@ const registerUser = async (ctx) => {
     console.log(admins)
 
     for (let i=0; i<admins.length; i++) {
+        console.log(admins[i].id_telegram)
         await bot.telegram.sendMessage(admins[i].id_telegram, `Привет! Новый пользователь пытается зарегистрироваться!\n` +
             `Для подтверждения регистрации пользователя @${username} нажмите кнопку!`, Keyboards.addUser(user_id));
     }
