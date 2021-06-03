@@ -15,6 +15,7 @@ const registerUser = async (ctx) => {
     const username = ctx.message.from.username;
     await userController.addUser(user_id, username, 'unregister');
     const admins = await userController.getUsers('Администратор');
+    console.log(admins)
 
     for (let i=0; i<admins.length; i++) {
         bot.telegram.sendMessage(admins[i].id_telegram, `Привет! Новый пользователь пытается зарегистрироваться!\n` +
