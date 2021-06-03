@@ -6,7 +6,7 @@ const Keyboards = require('/root/strategy_bot/keyboards/keyboards')
 const messageFormat = require('/root/strategy_bot/utils/message_format')
 const utils = require('/root/strategy_bot/utils/message_format')
 
-const bot = new Telegraf(process.env.BOT_TOKEN)
+const bot = new Telegraf('1765081269:AAGk4jJlz873-zOWwDlGD4AE6lKaMzoP2qU\n')
 require('dotenv').config()
 
 
@@ -111,7 +111,7 @@ const returnGrades = async (ctx, idea_uuid) => {
 const publishIdea = async (ctx, idea, title_message) => {
     let username = ctx.callbackQuery.from.username;
     let message = messageFormat.publishIdea(idea[0], title_message, username);
-    await bot.telegram.sendMessage(process.env.GROUP_ID, message);
+    await bot.telegram.sendMessage('-1001227140659', message);
 }
 
 
