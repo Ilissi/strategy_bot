@@ -1,4 +1,4 @@
-const db = require('../db')
+const db = require('/root/strategy_bot/db')
 
 
 
