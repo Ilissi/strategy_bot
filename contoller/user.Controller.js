@@ -1,4 +1,4 @@
-const db = require('/root/strategy_bot/db')
+const db = require('../db')
 
 class userController {
     async lookUpUser(user_id){

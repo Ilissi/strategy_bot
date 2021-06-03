@@ -1,4 +1,4 @@
-const pool = require('/root/strategy_bot/db')
+const pool = require('../db')
 
 async function createDatabase(){
     await pool.query("CREATE DATABASE botapp;", (err, res) => {

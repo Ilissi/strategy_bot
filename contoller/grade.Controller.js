@@ -1,4 +1,4 @@
-const db = require('/root/strategy_bot/db')
+const db = require('../db')
 
 const userController = require('/root/strategy_bot/contoller/user.Controller')
 
