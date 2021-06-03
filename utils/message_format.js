@@ -8,9 +8,11 @@ function generate_message_alert(UUID, ticket, strategy, order, percent, entry_pr
     return message
 }
 
+
+
 function managerMessage(first_criterion, second_criterion, third_criterion, comment){
     let summary = Number(first_criterion) + Number(second_criterion) + Number(third_criterion);
-    let message = `Оценка по критерию: @Драйверы к росту фундаментал@: ${first_criterion}\nОценка по критерию: @Точка входа по тех анализу@: ${second_criterion}\nОценка по критерию @Корректность типа стратегии@: ${third_criterion}\nИтоговоя оценка: ${summary} из 30\nКоментарий: ${comment}`;
+    let message = `Оценка по критерию: Драйверы к росту фундаменталу: ${first_criterion}\nОценка по критерию: Точка входа по тех анализу: ${second_criterion}\nОценка по критерию: Корректность типа стратегии: ${third_criterion}\nИтоговоя оценка: ${summary} из 30\nКоментарий: ${comment}`;
     return message;
 }
 
@@ -44,17 +46,21 @@ function generateTitle(){
     return '1. Драйверы к росту фундаментала.\n2. Точка входа по тех анализу.\n3. Корректность типа стратегии. \n4. Общая оценка.\n'
 }
 
-function generateString(username, firstCriterion, secondCriterion, thirdCriterion, summary, comment){
-    return ` ${username} | ${firstCriterion} | ${secondCriterion} | ${thirdCriterion} | ${summary} | ${comment}`
+function generateString(username, firstCriterion, secondCriterion, thirdCriterion, summary){
+    return `@${username} | ${firstCriterion} | ${secondCriterion} | ${thirdCriterion} | ${summary}`
 }
 
 function finishString(username, firstCriterion, secondCriterion, thirdCriterion, summary){
-    return `\n@${username} | ${firstCriterion} | ${secondCriterion} | ${thirdCriterion} | ${summary} `
+    return `\n${username} ${firstCriterion} | ${secondCriterion} | ${thirdCriterion} | ${summary} `
 }
 
 function generateComment(username, comment){
     return `\n${username}: \n${comment} `
 }
 
+function publishIdea(idea, title, username){
+    return `${title}\n@${username} \nТикер: ${idea.ticker}\nСтратегия: ${idea.type}\n#${idea.order_type} ${idea.percent}%\nЦена входа: ${idea.entry_price}$\nTP: ${idea.tp}$   SL: ${idea.sl}$\nСрок:  ${idea.timemodifier}\nИсточник:  ${idea.source}\nРиск:  ${idea.risk}/5\nКомментарий: ${idea.comment}`;
+}
+
 module.exports = { generate_message, managerMessage, getTime, generateList, generateFinishMessage, generateTitle,
-    generateString, finishString, generate_message_alert, generateComment}
+    generateString, finishString, generate_message_alert, generateComment, publishIdea}

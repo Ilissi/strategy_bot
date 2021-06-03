@@ -1,15 +1,15 @@
 const Telegraf = require('telegraf')
 const session = require('telegraf/session')
 const Stage = require('telegraf/stage')
-const Markup = require('telegraf/markup')
 
 require('dotenv').config()
 
-const userController = require('/root/strategy_bot/contoller/user.Controller')
+const userController = require('/root/strategy_bot/strategy/contoller/user.Controller')
+const strategyController = require('/root/strategy_bot/strategy/contoller/strategy.Controller')
 const contactDataWizard = require('/root/strategy_bot/scenes/addStrategy').contactDataWizard
 const editDataWizard = require('/root/strategy_bot/scenes/editStrategy').editDataWizard
 const gradeDataWizard = require('/root/strategy_bot/scenes/addGrade').gradeDataWizard
-const sendAdmin = require('/root/strategy_bot/utils/generate_message')
+const generateMessage = require('/root/strategy_bot/utils/generate_message')
 
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
@@ -25,7 +25,7 @@ bot.start(async (ctx) => {
     let check_block = await userController.checkStatus(ctx.message.chat.id, 'Отклонить')
     let userFirstName = ctx.message.from.first_name
     if (check_user.length == 0){
-        await sendAdmin.registerUser(ctx)
+        await generateMessage.registerUser(ctx)
         ctx.reply(`Привет, ${userFirstName}, дождись подтверждения регистрации у администратора! `)
     }
     else if(check_block.length == 1){
@@ -45,15 +45,38 @@ bot.command('add', ctx => {
 });
 
 
-bot.action(/updateStatus (.+)/, ctx => {
+bot.action(/updateStatus (.+)/, async (ctx) => {
     let message = ctx.callbackQuery.data;
-    sendAdmin.updateUser(ctx, message);
+    await generateMessage.updateUser(ctx, message);
 });
 
 bot.action(/grade (.+)/, ctx => {
     ctx.scene.enter('add_grade');
 });
 
+bot.action(/channel (.+)/, async (ctx) =>{
+    ctx.deleteMessage()
+    let uuid = ctx.callbackQuery.data.split(' ')[1];
+    let idea = await strategyController.updateStatusStrategy(uuid, 'Канал')
+    let title = 'Новая идея'
+    await generateMessage.publishIdea(ctx, idea, title)
+    console.log(idea)
+    ctx.reply(`Размещена в канал ID: ${uuid}`)
+});
+
+bot.action(/watchlist (.+)/, async (ctx) =>{
+    ctx.deleteMessage()
+    let uuid = ctx.callbackQuery.data.split(' ')[1];
+    let idea = await strategyController.updateStatusStrategy(uuid, 'WatchList')
+    ctx.reply(`Размещена в WL ID: ${uuid}`)
+});
+
+bot.action(/cancel (.+)/, async (ctx) =>{
+    ctx.deleteMessage()
+    let uuid = ctx.callbackQuery.data.split(' ')[1];
+    let idea = await strategyController.updateStatusStrategy(uuid, 'Отказ')
+    ctx.reply(`Отказ ID: ${uuid}`)
+});
 
 
 bot.launch()

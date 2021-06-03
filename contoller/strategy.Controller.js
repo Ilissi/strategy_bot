@@ -56,6 +56,16 @@ class strategyController {
         }catch (error) {
         }
     }
+
+    async updateStatusStrategy(strategy_id, status){
+        let response;
+        try {
+            response = await db.query('UPDATE strategy SET status = $1 WHERE id = $2 RETURNING *', [status, strategy_id]);
+            return response.rows;
+        }catch (error) {
+        }
+    }
+
 }
 
 

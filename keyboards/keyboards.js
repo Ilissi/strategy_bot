@@ -62,6 +62,12 @@ class Keyboards {
             [Markup.callbackButton('7', '7'), Markup.callbackButton('8', '8'), Markup.callbackButton('9', '9')],
             [Markup.callbackButton('10', '10')]]).extra();
     }
+
+    acceptIdeaChannel(uuid){
+        return Markup.inlineKeyboard([[Markup.callbackButton('Разместить в канал', `channel ${uuid}`)],
+            [Markup.callbackButton('Разместить в WatchList', `watchlist ${uuid}`)],
+            [Markup.callbackButton('Отказ', `cancel ${uuid}`)]]).extra();
+    }
 }
 
 module.exports = new Keyboards()

@@ -1,9 +1,9 @@
 const WizardScene = require('telegraf/scenes/wizard')
 
-const strategyController = require('../contoller/strategy.Controller')
-const Keyboards = require('../keyboards/keyboards')
-const messageFormat = require('../utils/message_format')
-const generateMessage = require('../utils/generate_message')
+const strategyController = require('/root/strategy_bot/contoller/strategy.Controller')
+const Keyboards = require('/root/strategy_bot/keyboards/keyboards')
+const messageFormat = require('/root/strategy_bot/utils/message_format')
+const generateMessage = require('/root/strategy_bot/utils/generate_message')
 
 
 
@@ -103,7 +103,9 @@ const contactDataWizard = new WizardScene(
         return ctx.wizard.next();
     },
     (ctx) => {
-        ctx.wizard.state.contactData.time = ctx.message.text;
+        if (typeof  ctx.wizard.state.contactData.time == 'undefined') {
+            ctx.wizard.state.contactData.time = ctx.message.text;
+        }
         ctx.reply('Введите комментарий:');
         return ctx.wizard.next();
     },

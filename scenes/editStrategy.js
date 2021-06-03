@@ -1,6 +1,6 @@
 const WizardScene = require('telegraf/scenes/wizard')
 
-const strategyController = require('../contoller/strategy.Controller')
+const strategyController = require('/root/strategy_bot/contoller/strategy.Controller')
 
 const editDataWizard = new WizardScene (
     'edit_strategy', (ctx) => {
