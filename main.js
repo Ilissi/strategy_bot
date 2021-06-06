@@ -4,12 +4,15 @@ const Stage = require('telegraf/stage')
 
 require('dotenv').config()
 
-const userController = require('/root/strategy_bot/contoller/user.Controller')
-const strategyController = require('/root/strategy_bot/contoller/strategy.Controller')
+const userController = require('/root/strategy_bot/strategy/contoller/user.Controller')
+const strategyController = require('/root/strategy_bot/strategy/contoller/strategy.Controller')
 const contactDataWizard = require('/root/strategy_bot/scenes/addStrategy').contactDataWizard
 const editDataWizard = require('/root/strategy_bot/scenes/editStrategy').editDataWizard
 const gradeDataWizard = require('/root/strategy_bot/scenes/addGrade').gradeDataWizard
+const searchIdea = require('/root/strategy_bot/scenes/searchIdea').searchIdeaWizard
+const editPermission = require('/root/strategy_bot/scenes/editPermissions').editPermissionsWizard
 const generateMessage = require('/root/strategy_bot/utils/generate_message')
+const Keyboards = require('/root/strategy_bot/keyboards/keyboards')
 
 
 const bot = new Telegraf('1765081269:AAGk4jJlz873-zOWwDlGD4AE6lKaMzoP2qU')
