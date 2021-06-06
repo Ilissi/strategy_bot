@@ -14,7 +14,6 @@ const editPermission = require('/root/strategy_bot/scenes/editPermissions').edit
 const generateMessage = require('/root/strategy_bot/utils/generate_message')
 const Keyboards = require('/root/strategy_bot/keyboards/keyboards')
 
-
 const bot = new Telegraf('1765081269:AAGk4jJlz873-zOWwDlGD4AE6lKaMzoP2qU')
 const stage = new Stage([contactDataWizard, editDataWizard, gradeDataWizard, searchIdea, editPermission]);
 bot.use(session())
