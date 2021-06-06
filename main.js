@@ -13,7 +13,7 @@ const generateMessage = require('/root/strategy_bot/utils/generate_message')
 
 
 const bot = new Telegraf('1765081269:AAGk4jJlz873-zOWwDlGD4AE6lKaMzoP2qU')
-const stage = new Stage([contactDataWizard, editDataWizard, gradeDataWizard])
+const stage = new Stage([contactDataWizard, editDataWizard, gradeDataWizard, searchIdea, editPermission]);
 bot.use(session())
 bot.use(stage.middleware())
 
