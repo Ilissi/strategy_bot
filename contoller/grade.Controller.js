@@ -48,6 +48,15 @@ class gradeController {
         } catch (error) {
         }
     }
+
+    async checkAccepted(strategy_id, telegram_id) {
+        let response;
+        try {
+            response = await db.query('SELECT * FROM strategy_grade WHERE strategy_id=$1 and user_id=$2', [strategy_id, telegram_id]);
+            return response.rows;
+        } catch (error) {
+        }
+    }
 }
 
 module.exports = new gradeController()

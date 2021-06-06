@@ -6,15 +6,23 @@ const gradeController = require('/root/strategy_bot/contoller/grade.Controller')
 const strategyController = require('/root/strategy_bot/contoller/strategy.Controller')
 const generateMessage = require('/root/strategy_bot/utils/generate_message')
 
-const gradeDataWizard = new WizardScene('add_grade', // first argument is Scene_ID, same as for BaseScene
-    (ctx) => {
+const gradeDataWizard = new WizardScene(
+    'add_grade', // first argument is Scene_ID, same as for BaseScene
+    async (ctx) => {
         ctx.wizard.state.contactData = {};
         ctx.wizard.state.contactData.username = ctx.callbackQuery.from.username;
         ctx.wizard.state.contactData.userid = ctx.callbackQuery.from.id;
         let list_data = ctx.callbackQuery.data.split(' ');
         ctx.wizard.state.contactData.UUID = list_data[1];
-        ctx.reply('Оцени драйверы к росту фундаментала:', Keyboards.insertGrade());
-        return ctx.wizard.next();
+        let checkResponse = await gradeController.checkAccepted(ctx.wizard.state.contactData.UUID, ctx.wizard.state.contactData.userid);
+        if (checkResponse.length == 0){
+            ctx.reply('Оцени драйверы к росту фундаментала:', Keyboards.insertGrade());
+            return ctx.wizard.next();
+        }
+        else {
+            ctx.reply('Вы уже оценили эту идею!');
+            return ctx.scene.leave();
+        }
     },
     (ctx) => {
         ctx.deleteMessage()
@@ -67,7 +75,6 @@ const gradeDataWizard = new WizardScene('add_grade', // first argument is Scene_
         else if(ctx.callbackQuery.data == 'ОК'){
             let response = await gradeController.createGrade(ctx.wizard.state.contactData)
             let boolPosted = await gradeController.checkResponse(ctx.wizard.state.contactData.UUID)
-            console.log(boolPosted)
             ctx.reply('Оценка отправлена')
             if (typeof response == 'undefined'){
                 ctx.reply('Ошибка формата текста! Сообщение не отправлено!')
@@ -87,6 +94,9 @@ const gradeDataWizard = new WizardScene('add_grade', // first argument is Scene_
 
 )
 
+
+
+module.exports = { gradeDataWizard }
 
 
 module.exports = { gradeDataWizard }

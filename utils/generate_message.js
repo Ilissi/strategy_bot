@@ -10,44 +10,71 @@ const bot = new Telegraf('1765081269:AAGk4jJlz873-zOWwDlGD4AE6lKaMzoP2qU')
 require('dotenv').config()
 
 
+
 const registerUser = async (ctx) => {
     const user_id = ctx.message.from.id;
     const username = ctx.message.from.username;
     await userController.addUser(user_id, username, 'unregister');
     const admins = await userController.getUsers('Администратор');
-    console.log(admins)
-
     for (let i=0; i<admins.length; i++) {
-        console.log(admins[i].id_telegram)
         await bot.telegram.sendMessage(admins[i].id_telegram, `Привет! Новый пользователь пытается зарегистрироваться!\n` +
             `Для подтверждения регистрации пользователя @${username} нажмите кнопку!`, Keyboards.addUser(user_id));
     }
 };
 
-const updateUser = async (ctx, message) => {
-    let response = message.split(' ');
-    let user_id = response[1]
-    let permissions = response[2]
-    if (permissions == 'Отклонить'){
-        await userController.updateStatus(user_id, permissions)
-        await bot.telegram.sendMessage(user_id, 'Администратор отклонил Вашу регистрацию')
+
+async function userRegister (ctx, user_id, permissions, admin_id, message, notification_message){
+    if (permissions == 'Отклонить') {
+        await userController.updateStatus(user_id, permissions);
+        await bot.telegram.sendMessage(user_id, 'Администратор отклонил Вашу регистрацию');
+    } else {
+        await userController.updateStatus(user_id, permissions);
+        await bot.telegram.sendMessage(user_id, `${message} Вы - ${permissions}.`);
     }
-    else {
-        await userController.updateStatus(user_id, permissions)
-        await bot.telegram.sendMessage(user_id, `Администратор подтвердил Вашу регистрацию. Вы - ${permissions}.`)
-    }
-    ctx.deleteMessage()
-    ctx.reply('Действие подтверждено!')
+    ctx.deleteMessage();
+    await notificationAdmin(ctx, user_id, admin_id, notification_message);
+    ctx.reply('Действие подтверждено!');
 }
 
-const sendIdea = async (ctx, message, idea_uuid, ticker) => {
-    const riskManagers = await userController.getUsers('Риск-менеджер');
-    for (let i = 0; i < riskManagers.length; i++) {
-        bot.telegram.sendMessage(riskManagers[i].id_telegram, message, Keyboards.acceptGrade(idea_uuid, ticker));
+
+const updateUser = async (ctx, message, admin_id) => {
+    let response = message.split(' ');
+    let user_id = response[1];
+    let permissions = response[2];
+    let user = await userController.lookUpUser(user_id);
+    if (user[0].permissions == 'unregister') {
+        let user_message = 'Администратор подтвердил Вашу регистрацию.';
+        let notification_message = `Привет! Новый пользователь @${user[0].nickname} зарегистрирован!`;
+        await userRegister(ctx, user_id, permissions, admin_id, user_message, notification_message);
     }
-    await setTimeout(notificationAlert, 1 * 60000, ctx, idea_uuid)
-    await setTimeout(notificationFinish, 2*60000, ctx, idea_uuid)
+    else {
+        let user_message = 'Администратор изменил Ваши права.';
+        let notification_message = `Привет! Права пользователя @${user[0].nickname} изменены!`;
+        await userRegister(ctx, user_id, permissions, admin_id, user_message, notification_message);
+    }
 }
+
+
+const notificationAdmin = async (ctx, user_id, admin_id, notification_message) =>{
+    let admins = await userController.getUsers('Администратор');
+    for (let i=0; i<admins.length; i++) {
+        if (admins[i].id_telegram != admin_id) {
+            await bot.telegram.sendMessage(admins[i].id_telegram, notification_message,
+                Keyboards.changePermissions(user_id));
+        }
+    }
+}
+
+
+const sendIdea = async (ctx, message, idea_uuid, ticker) => {
+    const riskManagers = await userController.getUsers('Аналитик');
+    for (let i = 0; i < riskManagers.length; i++) {
+        await bot.telegram.sendMessage(riskManagers[i].id_telegram, message, Keyboards.acceptGrade(idea_uuid, ticker));
+    }
+    await setTimeout(notificationAlert, 5 * 60000, ctx, idea_uuid)
+    await setTimeout(notificationFinish, 20*60000, ctx, idea_uuid)
+}
+
 
 const notificationAlert = async (ctx, idea_uuid) => {
     const getStrategyApprove = await strategyController.checkApprove(idea_uuid);
@@ -57,10 +84,11 @@ const notificationAlert = async (ctx, idea_uuid) => {
         let alertManager = utils.generateList(riskManagers, approveRiskManagers)
         let message = 'Осталось 15 минут для оценки идеи'
         for (let i = 0; i < alertManager.length; i++){
-            bot.telegram.sendMessage(alertManager[i].id_telegram, message)
+            await bot.telegram.sendMessage(alertManager[i].id_telegram, message)
         }
     }
 }
+
 
 const notificationFinish = async (ctx, idea_uuid) => {
     const getStrategyApprove = await strategyController.checkApprove(idea_uuid);
@@ -70,6 +98,7 @@ const notificationFinish = async (ctx, idea_uuid) => {
     }
 }
 
+
 const returnGrades = async (ctx, idea_uuid) => {
     const grades = await gradeController.returnGrades(idea_uuid);
     const idea = await strategyController.getStrategyByUUID(idea_uuid);
@@ -77,8 +106,8 @@ const returnGrades = async (ctx, idea_uuid) => {
         idea[0].percent, idea[0].entry_price, idea[0].tp, idea[0].sl, idea[0].timemodifier, idea[0].source, idea[0].risk,
         idea[0].comment);
     if (grades.length == 0){
-        bot.telegram.sendMessage(idea[0].id_telegram, idea_message);
-        bot.telegram.sendMessage(idea[0].id_telegram, 'Риск-менеджеры не оставили оценки Вашей стратегии',
+        await bot.telegram.sendMessage(idea[0].id_telegram, idea_message);
+        await bot.telegram.sendMessage(idea[0].id_telegram, 'Риск-менеджеры не оставили оценки Вашей стратегии',
             Keyboards.acceptIdeaChannel(idea_uuid));
     }
     else {
@@ -110,10 +139,11 @@ const returnGrades = async (ctx, idea_uuid) => {
     }
 }
 
+
 const publishIdea = async (ctx, idea, title_message) => {
     let username = ctx.callbackQuery.from.username;
     let message = messageFormat.publishIdea(idea[0], title_message, username);
-    await bot.telegram.sendMessage('-1001227140659', message);
+    await bot.telegram.sendMessage(process.env.GROUP_ID, message);
 }
 
 

@@ -28,12 +28,11 @@ async function createDatabase(){
             "comment VARCHAR(255) NOT NULL, " +
             "ts TIMESTAMP NOT NULL, " +
             "status VARCHAR(255), " +
-            "approved BOOLEAN);",
+            "approved BOOLEAN," +
+            "watchlist BOOLEAN);",
             (err, res) => {
                 console.log(err, res);
             });
-
-
         pool.query("CREATE TABLE IF NOT EXISTS strategy_grade (" +
             "id SERIAL PRIMARY KEY, " +
             "nickname VARCHAR(255)," +

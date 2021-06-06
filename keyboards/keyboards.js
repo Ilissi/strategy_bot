@@ -44,11 +44,11 @@ class Keyboards {
 
     riskKeyboard(){
         return Markup.inlineKeyboard([
-            [Markup.callbackButton('4', '4'),
-            Markup.callbackButton('5', '5')],
-            [Markup.callbackButton('2', '2'),
-            Markup.callbackButton('3', '3')],
-            [Markup.callbackButton('1', '1')]]).extra();
+            [Markup.callbackButton('4️⃣', '4'),
+                Markup.callbackButton('5️⃣', '5')],
+            [Markup.callbackButton('2️⃣', '2'),
+                Markup.callbackButton('3️⃣', '3')],
+            [Markup.callbackButton('1️⃣', '1')]]).extra();
     }
 
     acceptGrade(uuid, ticker){
@@ -57,16 +57,20 @@ class Keyboards {
 
     insertGrade(){
         return Markup.inlineKeyboard([
-            [Markup.callbackButton('1', '1'), Markup.callbackButton('2', '2'), Markup.callbackButton('3', '3')],
-            [Markup.callbackButton('4', '4'), Markup.callbackButton('5', '5'), Markup.callbackButton('6', '6')],
-            [Markup.callbackButton('7', '7'), Markup.callbackButton('8', '8'), Markup.callbackButton('9', '9')],
-            [Markup.callbackButton('10', '10')]]).extra();
+            [Markup.callbackButton('1️⃣', '1'), Markup.callbackButton('2️⃣', '2'), Markup.callbackButton('3️⃣', '3')],
+            [Markup.callbackButton('4️⃣', '4'), Markup.callbackButton('5️⃣', '5'), Markup.callbackButton('6️⃣', '6')],
+            [Markup.callbackButton('7️⃣', '7'), Markup.callbackButton('8️⃣', '8'), Markup.callbackButton('9️⃣', '9')],
+            [Markup.callbackButton('🔟', '10')]]).extra();
     }
 
     acceptIdeaChannel(uuid){
         return Markup.inlineKeyboard([[Markup.callbackButton('Разместить в канал', `channel ${uuid}`)],
             [Markup.callbackButton('Разместить в WatchList', `watchlist ${uuid}`)],
             [Markup.callbackButton('Отказ', `cancel ${uuid}`)]]).extra();
+    }
+
+    changePermissions(user_id){
+        return Markup.inlineKeyboard([Markup.callbackButton('Поменять роль', `change ${user_id}`)]).extra();
     }
 }
 
