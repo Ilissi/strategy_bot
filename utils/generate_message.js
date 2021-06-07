@@ -143,7 +143,7 @@ const returnGrades = async (ctx, idea_uuid) => {
 const publishIdea = async (ctx, idea, title_message) => {
     let username = ctx.callbackQuery.from.username;
     let message = messageFormat.publishIdea(idea[0], title_message, username);
-    await bot.telegram.sendMessage(process.env.GROUP_ID, message);
+    await bot.telegram.sendMessage(-1001231624146, message);
 }
 
 
