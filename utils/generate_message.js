@@ -1,14 +1,13 @@
 const Telegraf = require('telegraf')
-const userController = require('/root/strategy_bot/contoller/user.Controller')
-const gradeController = require('/root/strategy_bot/contoller/grade.Controller')
-const strategyController = require('/root/strategy_bot/contoller/strategy.Controller')
-const Keyboards = require('/root/strategy_bot/keyboards/keyboards')
-const messageFormat = require('/root/strategy_bot/utils/message_format')
-const utils = require('/root/strategy_bot/utils/message_format')
+const userController = require('../contoller/user.Controller')
+const gradeController = require('../contoller/grade.Controller')
+const strategyController = require('../contoller/strategy.Controller')
+const Keyboards = require('../keyboards/keyboards')
+const messageFormat = require('../utils/message_format')
+const utils = require('../utils/message_format')
 
-const bot = new Telegraf('1765081269:AAGk4jJlz873-zOWwDlGD4AE6lKaMzoP2qU')
+const bot = new Telegraf(process.env.BOT_TOKEN)
 require('dotenv').config()
-
 
 
 const registerUser = async (ctx) => {
@@ -16,9 +15,10 @@ const registerUser = async (ctx) => {
     const username = ctx.message.from.username;
     await userController.addUser(user_id, username, 'unregister');
     const admins = await userController.getUsers('Администратор');
+    let action = 'updateStatus'
     for (let i=0; i<admins.length; i++) {
         await bot.telegram.sendMessage(admins[i].id_telegram, `Привет! Новый пользователь пытается зарегистрироваться!\n` +
-            `Для подтверждения регистрации пользователя @${username} нажмите кнопку!`, Keyboards.addUser(user_id));
+            `Для подтверждения регистрации пользователя @${username} нажмите кнопку!`, Keyboards.addUser(action, user_id));
     }
 };
 
@@ -67,12 +67,12 @@ const notificationAdmin = async (ctx, user_id, admin_id, notification_message) =
 
 
 const sendIdea = async (ctx, message, idea_uuid, ticker) => {
-    const riskManagers = await userController.getUsers('Аналитик');
+    const riskManagers = await userController.getUsers('Риск-менеджер');
     for (let i = 0; i < riskManagers.length; i++) {
         await bot.telegram.sendMessage(riskManagers[i].id_telegram, message, Keyboards.acceptGrade(idea_uuid, ticker));
     }
-    await setTimeout(notificationAlert, 5 * 60000, ctx, idea_uuid)
-    await setTimeout(notificationFinish, 20*60000, ctx, idea_uuid)
+    await setTimeout(notificationAlert, 1 * 60000, ctx, idea_uuid)
+    await setTimeout(notificationFinish, 2 * 60000, ctx, idea_uuid)
 }
 
 
@@ -93,7 +93,7 @@ const notificationAlert = async (ctx, idea_uuid) => {
 const notificationFinish = async (ctx, idea_uuid) => {
     const getStrategyApprove = await strategyController.checkApprove(idea_uuid);
     if (getStrategyApprove.length == 0){
-        await strategyController.updateApprove(idea_uuid);
+        await strategyController.updateApprove(true, idea_uuid);
         await returnGrades(ctx, idea_uuid)
     }
 }
@@ -143,8 +143,9 @@ const returnGrades = async (ctx, idea_uuid) => {
 const publishIdea = async (ctx, idea, title_message) => {
     let username = ctx.callbackQuery.from.username;
     let message = messageFormat.publishIdea(idea[0], title_message, username);
-    await bot.telegram.sendMessage(-1001231624146, message);
+    await bot.telegram.sendMessage(process.env.GROUP_ID, message);
 }
+
 
 
 module.exports = { registerUser, updateUser, sendIdea, returnGrades, publishIdea }

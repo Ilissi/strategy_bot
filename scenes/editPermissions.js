@@ -1,7 +1,7 @@
 const WizardScene = require('telegraf/scenes/wizard')
 
-const userController = require('/root/strategy_bot/contoller/user.Controller')
-const Keyboards = require('/root/strategy_bot/keyboards/keyboards')
+const userController = require('../contoller/user.Controller')
+const Keyboards = require('../keyboards/keyboards')
 
 const editPermissionsWizard = new WizardScene(
     'edit_permissions', (ctx) => {
@@ -19,7 +19,8 @@ const editPermissionsWizard = new WizardScene(
                 return ctx.scene.leave();
             }
             else {
-                ctx.reply(`Определите новые права для ${username}`, Keyboards.addUser(userSearch[0].id_telegram))
+                let action = 'editStatus'
+                ctx.reply(`Определите новые права для ${username}`, Keyboards.addUser(action, userSearch[0].id_telegram))
                 return ctx.scene.leave();
             }
         }

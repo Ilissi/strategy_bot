@@ -1,10 +1,9 @@
 const WizardScene = require('telegraf/scenes/wizard')
 
-const strategyController = require('/root/strategy_bot/contoller/strategy.Controller')
-const Keyboards = require('/root/strategy_bot/keyboards/keyboards')
-const messageFormat = require('/root/strategy_bot/utils/message_format')
-const generateMessage = require('/root/strategy_bot/utils/generate_message')
-
+const strategyController = require('../contoller/strategy.Controller')
+const Keyboards = require('../keyboards/keyboards')
+const messageFormat = require('../utils/message_format')
+const generateMessage = require('../utils/generate_message')
 
 const contactDataWizard = new WizardScene(
     'add_strategy', // first argument is Scene_ID, same as for BaseScene
@@ -86,9 +85,9 @@ const contactDataWizard = new WizardScene(
             return ctx.scene.leave();
         }
         else {
-            ctx.wizard.state.contactData.risk = ctx.callbackQuery.data;
-            ctx.reply('Введите TP:');
-            return ctx.wizard.next();
+        ctx.wizard.state.contactData.risk = ctx.callbackQuery.data;
+        ctx.reply('Введите TP:');
+        return ctx.wizard.next();
         }
     },
     (ctx) => {
@@ -131,7 +130,7 @@ const contactDataWizard = new WizardScene(
         ctx.deleteMessage()
         if (typeof ctx.message == 'object'){
             ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши /add еще раз!')
-        }
+    }
         else if(ctx.callbackQuery.data == 'ОК'){
             let record_list = [ctx.wizard.state.contactData.type, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.ticker,
                 ctx.wizard.state.contactData.order, ctx.wizard.state.contactData.price_enter, ctx.wizard.state.contactData.percent,

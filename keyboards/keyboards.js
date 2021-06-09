@@ -28,12 +28,12 @@ class Keyboards {
             Markup.callbackButton('Buy', 'Buy')]).extra();
     }
 
-    addUser(telegram_id) {
+    addUser(action, telegram_id) {
         return Markup.inlineKeyboard([
-            [Markup.callbackButton('Аналитик', `updateStatus ${telegram_id} Аналитик`)],
-            [Markup.callbackButton('Риск-менеджер', `updateStatus ${telegram_id} Риск-менеджер`)],
-            [Markup.callbackButton('Администратор', `updateStatus ${telegram_id} Администратор`)],
-            [Markup.callbackButton('Отклонить', `updateStatus ${telegram_id} Отклонить`)]]).extra();
+            [Markup.callbackButton('Аналитик', `${action} ${telegram_id} Аналитик`)],
+            [Markup.callbackButton('Риск-менеджер', `${action} ${telegram_id} Риск-менеджер`)],
+            [Markup.callbackButton('Администратор', `${action} ${telegram_id} Администратор`)],
+            [Markup.callbackButton('Отклонить', `${action} ${telegram_id} Отклонить`)]]).extra();
     }
 
     acceptIdea() {
@@ -45,9 +45,9 @@ class Keyboards {
     riskKeyboard(){
         return Markup.inlineKeyboard([
             [Markup.callbackButton('4️⃣', '4'),
-                Markup.callbackButton('5️⃣', '5')],
+            Markup.callbackButton('5️⃣', '5')],
             [Markup.callbackButton('2️⃣', '2'),
-                Markup.callbackButton('3️⃣', '3')],
+            Markup.callbackButton('3️⃣', '3')],
             [Markup.callbackButton('1️⃣', '1')]]).extra();
     }
 
@@ -71,6 +71,22 @@ class Keyboards {
 
     changePermissions(user_id){
         return Markup.inlineKeyboard([Markup.callbackButton('Поменять роль', `change ${user_id}`)]).extra();
+    }
+
+    takeProfit(uuid) {
+        return Markup.inlineKeyboard([Markup.callbackButton('Зафиксировать доход', `tp ${uuid}`)]).extra();
+    }
+
+    stopLoss(uuid) {
+        return Markup.inlineKeyboard([Markup.callbackButton('Зафиксировать убыток', `sl ${uuid}`)]).extra();
+    }
+
+    averageIdea(uuid) {
+        return Markup.inlineKeyboard([Markup.callbackButton('Усреднить идею', `average ${uuid}`)]).extra();
+    }
+
+    acceptWatchlist() {
+        return Markup.inlineKeyboard([Markup.callbackButton('Отправить', 'Отправить')]).extra();
     }
 }
 

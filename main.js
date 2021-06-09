@@ -4,20 +4,22 @@ const Stage = require('telegraf/stage')
 
 require('dotenv').config()
 
-const userController = require('/root/strategy_bot/contoller/user.Controller')
-const strategyController = require('/root/strategy_bot/contoller/strategy.Controller')
-const contactDataWizard = require('/root/strategy_bot/scenes/addStrategy').contactDataWizard
-const editDataWizard = require('/root/strategy_bot/scenes/editStrategy').editDataWizard
-const gradeDataWizard = require('/root/strategy_bot/scenes/addGrade').gradeDataWizard
-const searchIdea = require('/root/strategy_bot/scenes/searchIdea').searchIdeaWizard
-const editPermission = require('/root/strategy_bot/scenes/editPermissions').editPermissionsWizard
-const generateMessage = require('/root/strategy_bot/utils/generate_message')
-const Keyboards = require('/root/strategy_bot/keyboards/keyboards')
+const userController = require('../strategy/contoller/user.Controller')
+const strategyController = require('../strategy/contoller/strategy.Controller')
+const contactDataWizard = require('./scenes/addStrategy').contactDataWizard
+const editDataWizard = require('./scenes/editStrategy').editDataWizard
+const gradeDataWizard = require('./scenes/addGrade').gradeDataWizard
+const searchIdea = require('./scenes/searchIdea').searchIdeaWizard
+const editPermission = require('./scenes/editPermissions').editPermissionsWizard
+const publishWatchList = require('./scenes/approveWatchList').publishWatchListWizard
+const generateMessage = require('./utils/generate_message')
+const Keyboards = require('./keyboards/keyboards')
 
-const bot = new Telegraf('1765081269:AAGk4jJlz873-zOWwDlGD4AE6lKaMzoP2qU')
-const stage = new Stage([contactDataWizard, editDataWizard, gradeDataWizard, searchIdea, editPermission]);
-bot.use(session())
-bot.use(stage.middleware())
+
+const bot = new Telegraf(process.env.BOT_TOKEN);
+const stage = new Stage([contactDataWizard, editDataWizard, gradeDataWizard, searchIdea, editPermission, publishWatchList]);
+bot.use(session());
+bot.use(stage.middleware());
 
 
 
@@ -43,10 +45,10 @@ bot.start(async (ctx) => {
 
 
 bot.command('add', async (ctx) => {
-    if (await userController.checkPermission(ctx.message.chat.id, 'Риск-менеджер')){
-        ctx.scene.enter('add_strategy');
-    }
-    else ctx.reply('У вас нет прав для этого!');
+   if (await userController.checkPermission(ctx.message.chat.id, 'Аналитик')){
+       ctx.scene.enter('add_strategy');
+   }
+   else ctx.reply('У вас нет прав для этого!');
 
 
 });
@@ -67,15 +69,29 @@ bot.command('edit', async (ctx) => {
 
 bot.action(/change (.+)/, async (ctx) =>{
     ctx.deleteMessage()
+    let action = 'editStatus'
     let user_id = ctx.callbackQuery.data.split(' ')[1];
-    ctx.reply('Выберите роль', Keyboards.addUser(user_id))
+    ctx.reply('Выберите роль', Keyboards.addUser(action, user_id))
 });
 
 bot.action(/updateStatus (.+)/, async (ctx) => {
+    let response = ctx.callbackQuery.data.split(' ');
+    let user_id = response[1];
+    let user = await userController.lookUpUser(user_id);
+    if (user[0].permissions == 'unregister') {
+        let message = ctx.callbackQuery.data;
+        let admin_id = ctx.callbackQuery.message.chat.id;
+        await generateMessage.updateUser(ctx, message, admin_id);
+    }
+    else ctx.reply('Действие закрыто другим админом.')
+});
+
+bot.action(/editStatus (.+)/, async (ctx) =>{
     let message = ctx.callbackQuery.data;
     let admin_id = ctx.callbackQuery.message.chat.id;
     await generateMessage.updateUser(ctx, message, admin_id);
-});
+})
+
 
 bot.action(/grade (.+)/, ctx => {
     ctx.scene.enter('add_grade');
@@ -104,5 +120,16 @@ bot.action(/cancel (.+)/, async (ctx) =>{
     ctx.reply(`Отказ ID: ${uuid}`);
 });
 
+bot.action(/tp (.+)/, async (ctx) =>{
+    ctx.scene.enter('generate_watchlist');
+});
+
+bot.action(/sl (.+)/, async (ctx) =>{
+    ctx.scene.enter('generate_watchlist');
+});
+
+bot.action(/average (.+)/, async (ctx) =>{
+    ctx.scene.enter('generate_watchlist');
+});
 
 bot.launch()

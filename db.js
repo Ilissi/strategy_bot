@@ -2,10 +2,10 @@ const { Pool } = require('pg')
 
 
 const pool = new Pool({
-    user: 'vick',
+    user: 'maksimboginic',
     host: '127.0.0.1',
     database: 'botapp',
-    password: 'vick1715',
+    password: '',
     port: '5432'}
 );
 

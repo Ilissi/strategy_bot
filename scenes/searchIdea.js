@@ -1,10 +1,10 @@
 const WizardScene = require('telegraf/scenes/wizard')
 const Telegraf = require('telegraf')
 
-const strategyController = require('/root/strategy_bot/contoller/strategy.Controller')
-const userController = require('/root/strategy_bot/contoller/user.Controller')
-const messageFormat = require('/root/strategy_bot/utils/message_format')
-const bot = new Telegraf('1765081269:AAGk4jJlz873-zOWwDlGD4AE6lKaMzoP2qU')
+const strategyController = require('../contoller/strategy.Controller')
+const userController = require('../contoller/user.Controller')
+const messageFormat = require('../utils/message_format')
+const bot = new Telegraf(process.env.BOT_TOKEN)
 
 const searchIdeaWizard = new WizardScene(
     'search_idea',
