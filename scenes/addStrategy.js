@@ -5,6 +5,8 @@ const Keyboards = require('../keyboards/keyboards')
 const messageFormat = require('../utils/message_format')
 const generateMessage = require('../utils/generate_message')
 
+
+
 const contactDataWizard = new WizardScene(
     'add_strategy', // first argument is Scene_ID, same as for BaseScene
     (ctx) => {
@@ -14,7 +16,10 @@ const contactDataWizard = new WizardScene(
     },
     (ctx) => {
         ctx.deleteMessage()
-        if (typeof ctx.message == 'object'){
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (typeof ctx.message == 'object'){
             ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши /add еще раз!')
             return ctx.scene.leave();
         }
@@ -25,7 +30,10 @@ const contactDataWizard = new WizardScene(
         }
     },
     (ctx) => {
-        if (typeof ctx.message == 'object'){
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (typeof ctx.message == 'object'){
             ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши /add еще раз!')
             return ctx.scene.leave();
         }
@@ -42,7 +50,10 @@ const contactDataWizard = new WizardScene(
         return ctx.wizard.next();
     },
     (ctx) => {
-        if (ctx.updateType == 'message'){
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (ctx.updateType == 'message'){
             ctx.wizard.state.contactData.source = ctx.message.text;
         }
         else {
@@ -52,13 +63,19 @@ const contactDataWizard = new WizardScene(
         return ctx.wizard.next();
     },
     (ctx) => {
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
         ctx.wizard.state.contactData.ticker = ctx.message.text;
         ctx.reply('Какое действие?', Keyboards.getOrder());
         return ctx.wizard.next();
     },
     (ctx) => {
         ctx.deleteMessage()
-        if (typeof ctx.message == 'object'){
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (typeof ctx.message == 'object'){
             ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши /add еще раз!')
             return ctx.scene.leave();
         }
@@ -69,46 +86,68 @@ const contactDataWizard = new WizardScene(
         }
     },
     (ctx) => {
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
         ctx.wizard.state.contactData.price_enter = ctx.message.text;
         ctx.reply('Введите долю портфеля:');
         return ctx.wizard.next();
     },
     (ctx) => {
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
         ctx.wizard.state.contactData.percent = ctx.message.text;
         ctx.reply('Оцените риск стратегии:', Keyboards.riskKeyboard())
         return ctx.wizard.next();
     },
     (ctx) => {
         ctx.deleteMessage()
-        if (typeof ctx.message == 'object'){
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (typeof ctx.message == 'object'){
             ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши /add еще раз!')
             return ctx.scene.leave();
         }
         else {
-        ctx.wizard.state.contactData.risk = ctx.callbackQuery.data;
-        ctx.reply('Введите TP:');
-        return ctx.wizard.next();
+            generateMessage.checkMessage(ctx, ctx.message);
+            ctx.wizard.state.contactData.risk = ctx.callbackQuery.data;
+            ctx.reply('Введите TP:');
+            return ctx.wizard.next();
         }
     },
     (ctx) => {
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
         ctx.wizard.state.contactData.TP = ctx.message.text;
         ctx.reply('Введите SL:');
         return ctx.wizard.next();
     },
     (ctx) => {
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
         ctx.wizard.state.contactData.SL = ctx.message.text;
         ctx.reply('Срок:');
         return ctx.wizard.next();
     },
     (ctx) => {
-        if (typeof  ctx.wizard.state.contactData.time == 'undefined') {
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (typeof  ctx.wizard.state.contactData.time == 'undefined') {
             ctx.wizard.state.contactData.time = ctx.message.text;
         }
         ctx.reply('Введите комментарий:');
         return ctx.wizard.next();
     },
     (ctx) => {
-        if (ctx.message.text.length > 30) {
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (ctx.message.text.length > 30) {
             let generate_ts = messageFormat.getTime();
             ctx.wizard.state.contactData.ts = generate_ts.timestamp;
             ctx.wizard.state.contactData.datemessage = generate_ts.message;
@@ -128,9 +167,12 @@ const contactDataWizard = new WizardScene(
     },
     async (ctx) => {
         ctx.deleteMessage()
-        if (typeof ctx.message == 'object'){
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (typeof ctx.message == 'object'){
             ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши /add еще раз!')
-    }
+        }
         else if(ctx.callbackQuery.data == 'ОК'){
             let record_list = [ctx.wizard.state.contactData.type, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.ticker,
                 ctx.wizard.state.contactData.order, ctx.wizard.state.contactData.price_enter, ctx.wizard.state.contactData.percent,

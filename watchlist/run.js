@@ -37,12 +37,12 @@ async function getYahooValue(tickerObject){
 
 
 async function buyOrder(yahooValue, ideaObject){
-  /*  if (ideaObject.tp <= yahooValue[ideaObject.ticker]){
+    if (ideaObject.tp <= yahooValue[ideaObject.ticker]){
         await alertBot.sendTP(ideaObject);
     }
     else if (ideaObject.sl >= yahooValue[ideaObject.ticker]){
         await alertBot.sendSL(ideaObject);
-    } */
+    }
     if (getPercentBuy(yahooValue[ideaObject.ticker], ideaObject.entry_price) == true){
         await alertBot.averageIdea(ideaObject);
     }

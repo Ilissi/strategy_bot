@@ -6,6 +6,7 @@ const userController = require('../contoller/user.Controller')
 const messageFormat = require('../utils/message_format')
 const Keyboards = require('../keyboards/keyboards')
 
+require('dotenv').config()
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
 function updateParameters(order_type, ideaObject){
@@ -85,7 +86,7 @@ const publishWatchListWizard = new WizardScene(
             else {
                 let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],
                     ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
-                await bot.telegram.sendMessage(-1001231624146, message);
+                await bot.telegram.sendMessage(process.env.GROUP_ID, message);
                 await ctx.reply('Сообщение отправлено в канал.')
             }
         }

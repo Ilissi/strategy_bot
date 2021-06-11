@@ -5,9 +5,9 @@ const userController = require('../contoller/user.Controller')
 const strategyController = require('../contoller/strategy.Controller')
 const keyboards = require('../keyboards/keyboards')
 
+require('dotenv').config()
 
-
-const bot = new Telegraf('1765081269:AAGk4jJlz873-zOWwDlGD4AE6lKaMzoP2qU');
+const bot = new Telegraf(process.env.BOT_TOKEN);
 
 async function sendTP(ideaObject) {
     let title = 'Закрытие сделки по TP';

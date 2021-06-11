@@ -146,6 +146,13 @@ const publishIdea = async (ctx, idea, title_message) => {
     await bot.telegram.sendMessage(process.env.GROUP_ID, message);
 }
 
+function checkMessage(ctx, message) {
+    try {
+        if (message.text == '/cancel') {
+            return true;
+        }
+    }
+    catch (err){}
+}
 
-
-module.exports = { registerUser, updateUser, sendIdea, returnGrades, publishIdea }
+module.exports = { registerUser, updateUser, sendIdea, returnGrades, publishIdea, checkMessage }

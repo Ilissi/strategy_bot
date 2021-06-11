@@ -6,6 +6,8 @@ const gradeController = require('../contoller/grade.Controller')
 const strategyController = require('../contoller/strategy.Controller')
 const generateMessage = require('../utils/generate_message')
 
+
+
 const gradeDataWizard = new WizardScene(
     'add_grade', // first argument is Scene_ID, same as for BaseScene
     async (ctx) => {
@@ -26,7 +28,10 @@ const gradeDataWizard = new WizardScene(
     },
     (ctx) => {
         ctx.deleteMessage()
-        if (typeof ctx.message == 'object'){
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (typeof ctx.message == 'object'){
             ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНажми Оценить идею еще раз!')
             return ctx.scene.leave();
         }
@@ -38,7 +43,10 @@ const gradeDataWizard = new WizardScene(
     },
     (ctx) => {
         ctx.deleteMessage()
-        if (typeof ctx.message == 'object'){
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (typeof ctx.message == 'object'){
             ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНажми Оценить идею еще раз!')
             return ctx.scene.leave();
         }
@@ -50,7 +58,10 @@ const gradeDataWizard = new WizardScene(
     },
     (ctx) => {
         ctx.deleteMessage()
-        if (typeof ctx.message == 'object'){
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (typeof ctx.message == 'object'){
             ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНажми Оценить идею еще раз!')
             return ctx.scene.leave();
         }
@@ -61,6 +72,9 @@ const gradeDataWizard = new WizardScene(
         }
     },
     (ctx) => {
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
         ctx.wizard.state.contactData.comment = ctx.message.text;
         let message = messageFormat.managerMessage(ctx.wizard.state.contactData.first_criterion, ctx.wizard.state.contactData.second_criterion,
             ctx.wizard.state.contactData.third_criterion, ctx.wizard.state.contactData.comment);
@@ -69,7 +83,10 @@ const gradeDataWizard = new WizardScene(
     },
     async (ctx) => {
         ctx.deleteMessage()
-        if (typeof ctx.message == 'object'){
+        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (typeof ctx.message == 'object'){
             ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши Оценить идею еще раз!')
         }
         else if(ctx.callbackQuery.data == 'ОК'){

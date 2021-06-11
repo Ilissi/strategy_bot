@@ -45,10 +45,13 @@ bot.start(async (ctx) => {
 
 
 bot.command('add', async (ctx) => {
-   if (await userController.checkPermission(ctx.message.chat.id, 'Аналитик')){
-       ctx.scene.enter('add_strategy');
-   }
-   else ctx.reply('У вас нет прав для этого!');
+    if (await userController.checkPermission(ctx.message.chat.id, 'Аналитик')){
+        ctx.scene.enter('add_strategy');
+    }
+    else if (await userController.checkPermission(ctx.message.chat.id, 'Администратор')){
+        ctx.scene.enter('add_strategy');
+    }
+    else ctx.reply('У вас нет прав для этого!');
 
 
 });
