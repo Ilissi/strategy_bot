@@ -10,9 +10,9 @@ httpsOptions = {
 
 const app = express();
 
-app.post("/about", (req, res) => {
-    console.log( 'received webhook', req.body );
-    res.sendStatus(200);
+app.post("/about", function(request, response){
+
+    response.send("Approve");
 });
 
 https.createServer(httpsOptions, app).listen(3000);

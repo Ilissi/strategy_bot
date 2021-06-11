@@ -1,4 +1,27 @@
 {
+  "name": "strategy_bot",
+  "version": "1.0.0",
+  "description": "'First version for deployment'",
+  "main": "/root/strategy_bot/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ilissi/strategy_bot.git"
+  },
+  "keywords": [
+    "telegraf",
+    "psotgresql",
+    "async"
+  ],
+  "author": "Victor Kuzmisnkyi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ilissi/strategy_bot/issues"
+  },
+  "homepage": "https://github.com/Ilissi/strategy_bot#readme",
   "dependencies": {
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
