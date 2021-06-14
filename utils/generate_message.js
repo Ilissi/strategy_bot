@@ -73,8 +73,8 @@ const sendIdea = async (ctx, message, idea_uuid, ticker) => {
             await bot.telegram.sendMessage(riskManagers[i].id_telegram, message, Keyboards.acceptGrade(idea_uuid, ticker));
         }
     }
-    await setTimeout(notificationAlert, 1 * 60000, ctx, idea_uuid)
-    await setTimeout(notificationFinish, 1 * 60000, ctx, idea_uuid)
+    await setTimeout(notificationAlert, 5 * 60000, ctx, idea_uuid)
+    await setTimeout(notificationFinish, 20 * 60000, ctx, idea_uuid)
 }
 
 
