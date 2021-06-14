@@ -4,7 +4,7 @@ const Stage = require('telegraf/stage')
 
 require('dotenv').config()
 
-const userController = require('../strategy/contoller/user.Controller')
+const userController = require('./contoller/user.Controller')
 const contactDataWizard = require('./scenes/addStrategy').contactDataWizard
 const gradeDataWizard = require('./scenes/addGrade').gradeDataWizard
 const searchIdea = require('./scenes/searchIdea').searchIdeaWizard
