@@ -67,7 +67,7 @@ const notificationAdmin = async (ctx, user_id, admin_id, notification_message) =
 
 
 const sendIdea = async (ctx, message, idea_uuid, ticker) => {
-    const riskManagers = await userController.getUsers('Риск-менеджер');
+    const riskManagers = await userController.getUsers('Аналитик');
     for (let i = 0; i < riskManagers.length; i++) {
         if (riskManagers[i].id_telegram != ctx.chat.id) {
             await bot.telegram.sendMessage(riskManagers[i].id_telegram, message, Keyboards.acceptGrade(idea_uuid, ticker));
@@ -81,7 +81,7 @@ const sendIdea = async (ctx, message, idea_uuid, ticker) => {
 const notificationAlert = async (ctx, idea_uuid) => {
     const getStrategyApprove = await strategyController.checkApprove(idea_uuid);
     if (getStrategyApprove.length == 0) {
-        const riskManagers = await userController.getUsers('Риск-менеджер');
+        const riskManagers = await userController.getUsers('Аналитик');
         const approveRiskManagers = await gradeController.returnManagersApproved(idea_uuid)
         let alertManager = utils.generateList(riskManagers, approveRiskManagers)
         let message = 'Осталось 15 минут для оценки идеи'
@@ -113,14 +113,14 @@ const returnGrades = async (ctx, idea_uuid) => {
         const admins = await userController.getUsers('Администратор');
         for (let i = 0; i < admins.length; i++) {
             await bot.telegram.sendMessage(admins[i].id_telegram, idea_message);
-            await bot.telegram.sendMessage(admins[i].id_telegram, 'Риск-менеджеры не оставили оценки идее',
+            await bot.telegram.sendMessage(admins[i].id_telegram, 'Аналитики не оставили оценки идее',
                 Keyboards.acceptIdeaChannel(idea_uuid));
         }
     }
     else {
-        const riskManagers = await userController.getUsers('Риск-менеджер');
+        const riskManagers = await userController.getUsers('Аналитик');
         let format_message = []
-        if (await userController.checkPermission(idea[0].id_telegram, 'Риск-менеджер')) {
+        if (await userController.checkPermission(idea[0].id_telegram, 'Аналитик')) {
             format_message.push(messageFormat.generateFinishMessage(grades.length, riskManagers.length - 1));
             format_message.push(messageFormat.generateTitle());
         } else {

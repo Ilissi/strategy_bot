@@ -4,7 +4,7 @@ const Stage = require('telegraf/stage')
 
 require('dotenv').config()
 
-const userController = require('./contoller/user.Controller')
+const userController = require('.contoller/user.Controller')
 const contactDataWizard = require('./scenes/addStrategy').contactDataWizard
 const gradeDataWizard = require('./scenes/addGrade').gradeDataWizard
 const searchIdea = require('./scenes/searchIdea').searchIdeaWizard
@@ -43,7 +43,13 @@ bot.start(async (ctx) => {
 
 
 bot.command('add', async (ctx) => {
-    ctx.scene.enter('add_strategy');
+    if (await userController.checkPermission(ctx.message.chat.id, 'Администратор')){
+        ctx.scene.enter('add_strategy');
+    }
+    else if (await userController.checkPermission(ctx.message.chat.id, 'Аналитик')){
+        ctx.scene.enter('add_strategy');
+    }
+    else ctx.reply('У вас нет прав для этого!');
 });
 
 bot.command('search', async (ctx) => {
@@ -71,7 +77,7 @@ bot.action(/change (.+)/, async (ctx) =>{
     await ctx.deleteMessage();
     let action = 'editStatus';
     let user_id = ctx.callbackQuery.data.split(' ')[1];
-    await ctx.reply('Выберите роль', Keyboards.addUser(action, user_id))
+    await ctx.reply('Выберите роль', Keyboards.addUser(action, user_id));
 });
 
 bot.action(/updateStatus (.+)/, async (ctx) => {

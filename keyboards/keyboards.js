@@ -31,7 +31,6 @@ class Keyboards {
     addUser(action, telegram_id) {
         return Markup.inlineKeyboard([
             [Markup.callbackButton('Аналитик', `${action} ${telegram_id} Аналитик`)],
-            [Markup.callbackButton('Риск-менеджер', `${action} ${telegram_id} Риск-менеджер`)],
             [Markup.callbackButton('Администратор', `${action} ${telegram_id} Администратор`)],
             [Markup.callbackButton('Отключить', `${action} ${telegram_id} Отключить`)]]).extra();
     }

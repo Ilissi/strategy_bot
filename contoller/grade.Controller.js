@@ -21,9 +21,9 @@ class gradeController {
         let countManagers, countGrades, author;
         try {
             countGrades = await db.query('SELECT nickname FROM strategy_grade WHERE strategy_id=$1', [strategy_id]);
-            countManagers = await userController.getUsers('Риск-менеджер');
+            countManagers = await userController.getUsers('Аналитик');
             author = await strategyController.getStrategyByUUID(strategy_id);
-            if (await userController.checkPermission(author[0].id_telegram, 'Риск-менеджер')){
+            if (await userController.checkPermission(author[0].id_telegram, 'Аналитик')){
                 if (countGrades.rowCount == countManagers.length-1) {
                     return true;
                 }

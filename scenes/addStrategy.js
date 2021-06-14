@@ -96,7 +96,7 @@ const contactDataWizard = new WizardScene(
         }
         else {
             ctx.reply('Ошибка формата текста');
-            return tx.wizard.leave();
+            return ctx.scene.leave();
         }
     },
     (ctx) => {
@@ -134,7 +134,7 @@ const contactDataWizard = new WizardScene(
         }
         else {
             ctx.reply('Ошибка формата текста');
-            return ctx.wizard.leave();
+            return ctx.scene.leave();
         }
     },
     (ctx) => {
@@ -148,7 +148,7 @@ const contactDataWizard = new WizardScene(
         }
         else {
             ctx.reply('Ошибка формата текста');
-            return ctx.wizard.leave();
+            return ctx.scene.leave();
         }
     },
     (ctx) => {
@@ -197,7 +197,6 @@ const contactDataWizard = new WizardScene(
                 ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL, ctx.wizard.state.contactData.time, ctx.wizard.state.contactData.risk,
                 ctx.wizard.state.contactData.user_id, ctx.wizard.state.contactData.comment]
             let response = await strategyController.createStrategy(record_list);
-
             if (typeof response == 'undefined'){
                 ctx.reply('Ошибка формата текста! Сообщение не отправлено!')
             }
@@ -206,7 +205,7 @@ const contactDataWizard = new WizardScene(
                     ctx.wizard.state.contactData.order, ctx.wizard.state.contactData.percent, ctx.wizard.state.contactData.price_enter, ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL,
                     ctx.wizard.state.contactData.time, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.risk, ctx.wizard.state.contactData.comment)
                 await generateMessage.sendIdea(ctx, messageSend, response[0].id, ctx.wizard.state.contactData.ticker)
-                ctx.reply('Идея отправлена риск-менеджерам.')
+                ctx.reply('Идея отправлена аналитикам.')
             }
         }
         else if(ctx.callbackQuery.data == 'ОТМЕНА'){

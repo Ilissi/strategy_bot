@@ -99,6 +99,7 @@ const gradeDataWizard = new WizardScene(
         else if(ctx.callbackQuery.data == 'ОК'){
             let response = await gradeController.createGrade(ctx.wizard.state.contactData)
             let boolPosted = await gradeController.checkResponse(ctx.wizard.state.contactData.UUID)
+            console.log(boolPosted)
             ctx.reply('Оценка отправлена')
             if (typeof response == 'undefined'){
                 ctx.reply('Ошибка формата текста! Сообщение не отправлено!')

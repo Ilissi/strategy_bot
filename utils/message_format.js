@@ -66,7 +66,7 @@ function generateList(first_array, second_array) {
 
 
 function generateFinishMessage(firstArray, secondArray) {
-    return `${firstArray}/${secondArray} риск-менеджеров оценили\n`
+    return `${firstArray}/${secondArray} аналитиков оценили\n`
 }
 
 
