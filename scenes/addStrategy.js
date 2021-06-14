@@ -89,9 +89,15 @@ const contactDataWizard = new WizardScene(
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
             return ctx.scene.leave();
         }
-        ctx.wizard.state.contactData.price_enter = ctx.message.text;
-        ctx.reply('Введите долю портфеля:');
-        return ctx.wizard.next();
+        else if(generateMessage.checkDigitDiapason(ctx.message.text)) {
+            ctx.wizard.state.contactData.price_enter = ctx.message.text;
+            ctx.reply('Введите долю портфеля:');
+            return ctx.wizard.next();
+        }
+        else {
+            ctx.reply('Ошибка формата текста');
+            return tx.wizard.leave();
+        }
     },
     (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
@@ -121,17 +127,29 @@ const contactDataWizard = new WizardScene(
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
             return ctx.scene.leave();
         }
-        ctx.wizard.state.contactData.TP = ctx.message.text;
-        ctx.reply('Введите SL:');
-        return ctx.wizard.next();
+        else if(generateMessage.checkDigit(ctx.message.text)) {
+            ctx.wizard.state.contactData.TP = ctx.message.text;
+            ctx.reply('Введите SL:');
+            return ctx.wizard.next();
+        }
+        else {
+            ctx.reply('Ошибка формата текста');
+            return ctx.wizard.leave();
+        }
     },
     (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
             return ctx.scene.leave();
         }
-        ctx.wizard.state.contactData.SL = ctx.message.text;
-        ctx.reply('Срок:');
-        return ctx.wizard.next();
+        else if(generateMessage.checkDigit(ctx.message.text)) {
+            ctx.wizard.state.contactData.SL = ctx.message.text;
+            ctx.reply('Срок:');
+            return ctx.wizard.next();
+        }
+        else {
+            ctx.reply('Ошибка формата текста');
+            return ctx.wizard.leave();
+        }
     },
     (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){

@@ -33,7 +33,7 @@ class Keyboards {
             [Markup.callbackButton('Аналитик', `${action} ${telegram_id} Аналитик`)],
             [Markup.callbackButton('Риск-менеджер', `${action} ${telegram_id} Риск-менеджер`)],
             [Markup.callbackButton('Администратор', `${action} ${telegram_id} Администратор`)],
-            [Markup.callbackButton('Отклонить', `${action} ${telegram_id} Отклонить`)]]).extra();
+            [Markup.callbackButton('Отключить', `${action} ${telegram_id} Отключить`)]]).extra();
     }
 
     acceptIdea() {
@@ -66,7 +66,7 @@ class Keyboards {
     acceptIdeaChannel(uuid){
         return Markup.inlineKeyboard([[Markup.callbackButton('Разместить в канал', `channel ${uuid}`)],
             [Markup.callbackButton('Разместить в WatchList', `watchlist ${uuid}`)],
-            [Markup.callbackButton('Отказ', `cancel ${uuid}`)]]).extra();
+            [Markup.callbackButton('Отказ', `cancels ${uuid}`)]]).extra();
     }
 
     changePermissions(user_id){

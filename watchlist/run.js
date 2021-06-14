@@ -4,6 +4,9 @@ const alertBot = require('../watchlist/alertBot')
 
 
 function getPercentBuy(yahooValue, ideaObject){
+    if (ideaObject.includes('-')){
+        ideaObject = ideaObject.split('-')[1]; /*При покупке отталкиваемся от нижней цены диапазона*/
+    }
     let percent = (((ideaObject/yahooValue) * 100) - 100).toFixed();
     if (percent >= 15) return true;
     else return false;
@@ -11,6 +14,9 @@ function getPercentBuy(yahooValue, ideaObject){
 
 
 function getPercentSell(yahooValue, ideaObject){
+    if (ideaObject.includes('-')){
+        ideaObject = ideaObject.split('-')[0]; /*При продаже отталкиваемся от верхней цены диапазона*/
+    }
     let percent = (((yahooValue/ideaObject) * 100) - 100).toFixed();
     if (percent >= 15) return true;
     else return false;
@@ -43,7 +49,7 @@ async function buyOrder(yahooValue, ideaObject){
     else if (ideaObject.sl >= yahooValue[ideaObject.ticker]){
         await alertBot.sendSL(ideaObject);
     }
-    if (getPercentBuy(yahooValue[ideaObject.ticker], ideaObject.entry_price) == true){
+    else if (getPercentBuy(yahooValue[ideaObject.ticker], ideaObject.entry_price) == true){
         await alertBot.averageIdea(ideaObject);
     }
 }

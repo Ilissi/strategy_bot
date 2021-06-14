@@ -4,10 +4,8 @@ const Stage = require('telegraf/stage')
 
 require('dotenv').config()
 
-const userController = require('./contoller/user.Controller')
-const strategyController = require('./contoller/strategy.Controller')
+const userController = require('../strategy/contoller/user.Controller')
 const contactDataWizard = require('./scenes/addStrategy').contactDataWizard
-const editDataWizard = require('./scenes/editStrategy').editDataWizard
 const gradeDataWizard = require('./scenes/addGrade').gradeDataWizard
 const searchIdea = require('./scenes/searchIdea').searchIdeaWizard
 const editPermission = require('./scenes/editPermissions').editPermissionsWizard
@@ -17,7 +15,7 @@ const Keyboards = require('./keyboards/keyboards')
 
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
-const stage = new Stage([contactDataWizard, editDataWizard, gradeDataWizard, searchIdea, editPermission, publishWatchList]);
+const stage = new Stage([contactDataWizard, gradeDataWizard, searchIdea, editPermission, publishWatchList]);
 bot.use(session());
 bot.use(stage.middleware());
 
@@ -30,30 +28,22 @@ bot.start(async (ctx) => {
     let userFirstName = ctx.message.from.first_name
     if (check_user.length == 0){
         await generateMessage.registerUser(ctx)
-        ctx.reply(`Привет, ${userFirstName}, дождись подтверждения регистрации у администратора! `);
+        await ctx.reply(`Привет, ${userFirstName}, дождись подтверждения регистрации у администратора! `);
     }
     else if(check_block.length == 1){
-        ctx.reply(`Привет, ${userFirstName}. Администратор октлонил Вашу регистрацию. `);
+        await ctx.reply(`Привет, ${userFirstName}. Администратор октлонил Вашу регистрацию. `);
     }
     else if (check_status.length > 0){
-        ctx.reply(`Привет, ${userFirstName}, администратор еще не подтвердил твою регистрацию! `);
+        await ctx.reply(`Привет, ${userFirstName}, администратор еще не подтвердил твою регистрацию! `);
     }
     else {
-        ctx.reply(`С возвращением, ${userFirstName}!`);
+        await ctx.reply(`С возвращением, ${userFirstName}!`);
     }
 });
 
 
 bot.command('add', async (ctx) => {
-    if (await userController.checkPermission(ctx.message.chat.id, 'Аналитик')){
-        ctx.scene.enter('add_strategy');
-    }
-    else if (await userController.checkPermission(ctx.message.chat.id, 'Администратор')){
-        ctx.scene.enter('add_strategy');
-    }
-    else ctx.reply('У вас нет прав для этого!');
-
-
+    ctx.scene.enter('add_strategy');
 });
 
 bot.command('search', async (ctx) => {
@@ -67,14 +57,21 @@ bot.command('edit', async (ctx) => {
     if (await userController.checkPermission(ctx.message.chat.id, 'Администратор')){
         ctx.scene.enter('edit_permissions');
     }
+    else await ctx.reply('У вас нет прав для этого!');
+});
+
+bot.command('users', async (ctx) => {
+    if (await userController.checkPermission(ctx.message.chat.id, 'Администратор')){
+        await generateMessage.returnUsers(ctx)
+    }
     else ctx.reply('У вас нет прав для этого!');
 });
 
 bot.action(/change (.+)/, async (ctx) =>{
-    ctx.deleteMessage()
-    let action = 'editStatus'
+    await ctx.deleteMessage();
+    let action = 'editStatus';
     let user_id = ctx.callbackQuery.data.split(' ')[1];
-    ctx.reply('Выберите роль', Keyboards.addUser(action, user_id))
+    await ctx.reply('Выберите роль', Keyboards.addUser(action, user_id))
 });
 
 bot.action(/updateStatus (.+)/, async (ctx) => {
@@ -86,7 +83,7 @@ bot.action(/updateStatus (.+)/, async (ctx) => {
         let admin_id = ctx.callbackQuery.message.chat.id;
         await generateMessage.updateUser(ctx, message, admin_id);
     }
-    else ctx.reply('Действие закрыто другим админом.')
+    else await ctx.reply('Действие закрыто другим админом.')
 });
 
 bot.action(/editStatus (.+)/, async (ctx) =>{
@@ -101,26 +98,15 @@ bot.action(/grade (.+)/, ctx => {
 });
 
 bot.action(/channel (.+)/, async (ctx) =>{
-    ctx.deleteMessage()
-    let uuid = ctx.callbackQuery.data.split(' ')[1];
-    let idea = await strategyController.updateStatusStrategy(uuid, 'Канал');
-    let title = 'Новая идея';
-    await generateMessage.publishIdea(ctx, idea, title);
-    ctx.reply(`Размещена в канал ID: ${uuid}`);
+    await generateMessage.approveAdminIdea(ctx, ctx.callbackQuery.data);
 });
 
 bot.action(/watchlist (.+)/, async (ctx) =>{
-    ctx.deleteMessage()
-    let uuid = ctx.callbackQuery.data.split(' ')[1];
-    let idea = await strategyController.updateStatusStrategy(uuid, 'WatchList');
-    ctx.reply(`Размещена в WL ID: ${uuid}`);
+    await generateMessage.approveAdminIdea(ctx, ctx.callbackQuery.data);
 });
 
-bot.action(/cancel (.+)/, async (ctx) =>{
-    ctx.deleteMessage();
-    let uuid = ctx.callbackQuery.data.split(' ')[1];
-    let idea = await strategyController.updateStatusStrategy(uuid, 'Отказ')
-    ctx.reply(`Отказ ID: ${uuid}`);
+bot.action(/cancels (.+)/, async (ctx) =>{
+    await generateMessage.approveAdminIdea(ctx, ctx.callbackQuery.data);
 });
 
 bot.action(/tp (.+)/, async (ctx) =>{
@@ -134,5 +120,6 @@ bot.action(/sl (.+)/, async (ctx) =>{
 bot.action(/average (.+)/, async (ctx) =>{
     ctx.scene.enter('generate_watchlist');
 });
+
 
 bot.launch()

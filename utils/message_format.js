@@ -1,18 +1,42 @@
+function returnFormat(TP, SL){
+    let stringTP, stringSL;
+    if (TP == '-' && SL == '-') {
+        stringTP = TP;
+        stringSL = SL;
+    }
+    else if (TP == '-' && SL != '-'){
+        stringTP = TP;
+        stringSL = SL + '$';
+    }
+    else if (TP != '-' && SL == '-'){
+        stringTP = TP + '$';
+        stringSL = SL;
+    }
+    else {
+        stringTP = TP + '$';
+        stringSL = SL + '$';
+    }
+    return {'TP': stringTP, 'SL': stringSL}
+}
+
+
 function generate_message(username, ts, ticket, strategy, order, percent, entry_price, TP, SL, timemodifier, source, grade, comment) {
-    let message = `@${username} ${ts}\nТикер: ${ticket}\nСтратегия: ${strategy}\n#${order} ${percent}%\nЦена входа: ${entry_price}$\nTP: ${TP}$   SL: ${SL}$\nСрок:  ${timemodifier}\nИсточник:  ${source}\nРиск:  ${grade}/5\nКомментарий: ${comment}`;
+    let getFormat = returnFormat(TP, SL);
+    let message = `@${username} ${ts}\nТикер: ${ticket}\nСтратегия: ${strategy}\n#${order} ${percent}%\nЦена входа: ${entry_price}$\nTP: ${getFormat.TP}   SL: ${getFormat.SL}\nСрок:  ${timemodifier}\nИсточник:  ${source}\nРиск:  ${grade}/5\nКомментарий: ${comment}`;
     return message
 }
 
 
 function generate_message_alert(UUID, ticket, strategy, order, percent, entry_price, TP, SL, timemodifier, source, grade, comment) {
-    let message = `UUID: ${UUID} \nТикер: ${ticket}\nСтратегия: ${strategy}\n#${order} ${percent}%\nЦена входа: ${entry_price}$\nTP: ${TP}$   SL: ${SL}$\nСрок:  ${timemodifier}\nИсточник:  ${source}\nРиск:  ${grade}/5\nКомментарий: ${comment}`;
+    let getFormat = returnFormat(TP, SL);
+    let message = `UUID: ${UUID} \nТикер: ${ticket}\nСтратегия: ${strategy}\n#${order} ${percent}%\nЦена входа: ${entry_price}$\nTP: ${getFormat.TP}   SL: ${getFormat.SL}\nСрок:  ${timemodifier}\nИсточник:  ${source}\nРиск:  ${grade}/5\nКомментарий: ${comment}`;
     return message
 }
 
 
 function managerMessage(first_criterion, second_criterion, third_criterion, comment){
     let summary = Number(first_criterion) + Number(second_criterion) + Number(third_criterion);
-    let message = `Оценка по критерию: Драйверы к росту фундаменталу: ${first_criterion}\nОценка по критерию: Точка входа по тех анализу: ${second_criterion}\nОценка по критерию: Корректность типа стратегии: ${third_criterion}\nИтоговоя оценка: ${summary} из 30\nКоментарий: ${comment}`;
+    let message = `Драйверы к росту фундаменталу: ${first_criterion}\nТочка входа по тех анализу: ${second_criterion}\nКорректность типа стратегии: ${third_criterion}\nИтоговоя оценка: ${summary} из 30\nКоментарий: ${comment}`;
     return message;
 }
 
@@ -67,14 +91,21 @@ function generateComment(username, comment){
 
 
 function publishIdea(idea, title, username){
-    return `${title}\n@${username} \nТикер: ${idea.ticker}\nСтратегия: ${idea.type}\n#${idea.order_type} ${idea.percent}%\nЦена входа: ${idea.entry_price}$\nTP: ${idea.tp}$   SL: ${idea.sl}$\nСрок:  ${idea.timemodifier}\nИсточник:  ${idea.source}\nРиск:  ${idea.risk}/5\nКомментарий: ${idea.comment}`;
+    let getFormat = returnFormat(idea.tp, idea.sl);
+    return `${title}\n@${username} \nТикер: ${idea.ticker}\nСтратегия: ${idea.type}\n#${idea.order_type} ${idea.percent}%\nЦена входа: ${idea.entry_price}$\nTP: ${getFormat.TP}   SL: ${getFormat.SL}\nСрок:  ${idea.timemodifier}\nИсточник:  ${idea.source}\nРиск:  ${idea.risk}/5\nКомментарий: ${idea.comment}`;
 }
 
 
 function searchIdea(username, idea){
-    return `UUID: ${idea.id}\n@${username} \nТикер: ${idea.ticker}\nСтратегия: ${idea.type}\n#${idea.order_type} ${idea.percent}%\nЦена входа: ${idea.entry_price}$\nTP: ${idea.tp}$   SL: ${idea.sl}$\nСрок:  ${idea.timemodifier}\nИсточник:  ${idea.source}\nРиск:  ${idea.risk}/5\nКомментарий: ${idea.comment}`;
+    let getFormat = returnFormat(idea.tp, idea.sl);
+    return `UUID: ${idea.id}\n@${username} \nТикер: ${idea.ticker}\nСтратегия: ${idea.type}\n#${idea.order_type} ${idea.percent}%\nЦена входа: ${idea.entry_price}$\nTP: ${getFormat.TP}   SL: ${getFormat.SL}\nСрок:  ${idea.timemodifier}\nИсточник:  ${idea.source}\nРиск:  ${idea.risk}/5\nКомментарий: ${idea.comment}\nСтатус: ${idea.status}`;
+}
+
+function showUser(user){
+    return `Пользователь: @${user.nickname}\nПрава: ${user.permissions}`
 }
 
 
+
 module.exports = { generate_message, managerMessage, getTime, generateList, generateFinishMessage, generateTitle,
-    generateString, finishString, generate_message_alert, generateComment, publishIdea, searchIdea}
+    generateString, finishString, generate_message_alert, generateComment, publishIdea, searchIdea, showUser}

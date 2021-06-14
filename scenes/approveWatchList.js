@@ -9,60 +9,93 @@ const Keyboards = require('../keyboards/keyboards')
 require('dotenv').config()
 const bot = new Telegraf(process.env.BOT_TOKEN)
 
+
+function updateDiapason(percent, diapasonObject){
+    let array = diapasonObject.split('-');
+    let returnArray = []
+    for (let i = 0; i<array.length; i++){
+        returnArray.push((array[i] * percent).toFixed(2));
+    }
+    return returnArray.join('-');
+}
+
 function updateParameters(order_type, ideaObject){
-    if (order_type == 'Buy'){
+    if (ideaObject == '-'){
+        return ideaObject;
+    }
+    else if (order_type == 'Buy'){
         let percentDown = 0.85;
-        return (ideaObject * percentDown).toFixed(2);
+        if (ideaObject.includes('-')){
+            let diapason = updateDiapason(percentDown, ideaObject)
+            return diapason;
+        }
+        else return (ideaObject * percentDown).toFixed(2);
     }
     else if (order_type == 'Sell'){
         let percentUp = 1.15;
-        return (ideaObject * percentUp).toFixed(2);
+        if (ideaObject.includes('-')){
+            let diapason = updateDiapason(percentUp, ideaObject)
+            return diapason;
+        }
+        else return (ideaObject * percentUp).toFixed(2);
     }
 }
 
 
+
 const publishWatchListWizard = new WizardScene(
-    'generate_watchlist', (ctx) => {
-        ctx.wizard.state.contactData = {};
-        ctx.wizard.state.contactData.response = ctx.callbackQuery.data;
-        ctx.reply('Введите комментарий:');
-        return ctx.wizard.next();
+    'generate_watchlist', async (ctx) => {
+        let uuid = await strategyController.checkApprove((ctx.callbackQuery.data.split(' ')[1]));
+        if (uuid.length >= 1) {
+            ctx.wizard.state.contactData = {};
+            ctx.wizard.state.contactData.response = ctx.callbackQuery.data;
+            ctx.reply('Введите комментарий:');
+            return ctx.wizard.next();
+        }
+        else {
+            await ctx.reply('Решение по этой идеи уже принято.')
+        }
     },
     async (ctx) => {
-        let comment = ctx.message.text;
-        let upper_message = 'Подтвердите действие:\n';
-        let response = ctx.wizard.state.contactData.response.split(' ')
-        let ideaUUID = response[1];
-        ctx.wizard.state.contactData.ideaObject = await strategyController.getStrategyByUUID(ideaUUID);
-        ctx.wizard.state.contactData.username = await userController.lookUpUser(ctx.wizard.state.contactData.ideaObject[0].id_telegram);
-        ctx.wizard.state.contactData.ideaObject[0].comment = comment;
-        if (response[0] == 'tp'){
-            ctx.wizard.state.contactData.title = 'Закрытие сделки по TP';
-            let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],
-                ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
-            let confirm_message = upper_message + message;
-            ctx.reply(confirm_message, Keyboards.acceptWatchlist());
+        if (typeof ctx.message.text == 'undefined'){
+            ctx.reply('Попробуйте еще раз!')
+            ctx.wizard.leave();
         }
-        else if (response[0] == 'sl'){
-            ctx.wizard.state.contactData.title = 'Закрытие сделки по SL';
-            let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],
-                ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
-            let confirm_message = upper_message + message;
-            ctx.reply(confirm_message, Keyboards.acceptWatchlist());
-        }
-        else if (response[0] == 'average'){
-            ctx.wizard.state.contactData.title = 'Усреднение по идеи';
-            ctx.wizard.state.contactData.ideaObject[0].tp = updateParameters(ctx.wizard.state.contactData.ideaObject[0].order_type,
-                ctx.wizard.state.contactData.ideaObject[0].tp);
-            ctx.wizard.state.contactData.ideaObject[0].sl = updateParameters(ctx.wizard.state.contactData.ideaObject[0].order_type,
-                ctx.wizard.state.contactData.ideaObject[0].sl);
-            ctx.wizard.state.contactData.ideaObject[0].entry_price = updateParameters(ctx.wizard.state.contactData.ideaObject[0].order_type,
-                ctx.wizard.state.contactData.ideaObject[0].entry_price);
-            let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],
-                ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
-            let confirm_message = upper_message + message;
-            ctx.reply(confirm_message, Keyboards.acceptWatchlist());
-
+        else {
+            let comment = ctx.message.text;
+            let upper_message = 'Подтвердите действие:\n';
+            let response = ctx.wizard.state.contactData.response.split(' ')
+            let ideaUUID = response[1];
+            ctx.wizard.state.contactData.ideaObject = await strategyController.getStrategyByUUID(ideaUUID);
+            ctx.wizard.state.contactData.username = await userController.lookUpUser(ctx.wizard.state.contactData.ideaObject[0].id_telegram);
+            ctx.wizard.state.contactData.ideaObject[0].comment = comment;
+            if (response[0] == 'tp'){
+                ctx.wizard.state.contactData.title = 'Закрытие сделки по TP';
+                let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],
+                    ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
+                let confirm_message = upper_message + message;
+                ctx.reply(confirm_message, Keyboards.acceptWatchlist());
+            }
+            else if (response[0] == 'sl'){
+                ctx.wizard.state.contactData.title = 'Закрытие сделки по SL';
+                let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],
+                    ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
+                let confirm_message = upper_message + message;
+                ctx.reply(confirm_message, Keyboards.acceptWatchlist());
+            }
+            else if (response[0] == 'average') {
+                ctx.wizard.state.contactData.title = 'Усреднение по идеи';
+                ctx.wizard.state.contactData.ideaObject[0].tp = updateParameters(ctx.wizard.state.contactData.ideaObject[0].order_type,
+                    ctx.wizard.state.contactData.ideaObject[0].tp);
+                ctx.wizard.state.contactData.ideaObject[0].sl = updateParameters(ctx.wizard.state.contactData.ideaObject[0].order_type,
+                    ctx.wizard.state.contactData.ideaObject[0].sl);
+                ctx.wizard.state.contactData.ideaObject[0].entry_price = updateParameters(ctx.wizard.state.contactData.ideaObject[0].order_type,
+                    ctx.wizard.state.contactData.ideaObject[0].entry_price);
+                let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],
+                    ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
+                let confirm_message = upper_message + message;
+                ctx.reply(confirm_message, Keyboards.acceptWatchlist());
+            }
         }
         return ctx.wizard.next();
     },
@@ -75,12 +108,14 @@ const publishWatchListWizard = new WizardScene(
             let response =  ctx.wizard.state.contactData.response.split(' ');
             if (response[0] == 'average'){
                 let idea_value = ctx.wizard.state.contactData.ideaObject[0];
-                let response = await strategyController.createStrategy(Object.values(idea_value));
-                await strategyController.updateApprove(true, response[0].id);
-                await strategyController.updateStatusStrategy('Канал', response[0].id);
+                console.log(idea_value)
+                let newResponse = await strategyController.createAverageStrategy(Object.values(idea_value));
+                console.log(response)
+                await strategyController.updateApprove(false, response[1]);
+                await strategyController.updateStatusStrategy('Канал', newResponse[0].id);
                 let message = messageFormat.publishIdea(idea_value,
                     ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
-                await bot.telegram.sendMessage(-1001231624146, message);
+                await bot.telegram.sendMessage(process.env.GROUP_ID, message);
                 await ctx.reply('Сообщение отправлено в канал.')
             }
             else {

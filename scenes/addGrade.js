@@ -16,13 +16,20 @@ const gradeDataWizard = new WizardScene(
         ctx.wizard.state.contactData.userid = ctx.callbackQuery.from.id;
         let list_data = ctx.callbackQuery.data.split(' ');
         ctx.wizard.state.contactData.UUID = list_data[1];
-        let checkResponse = await gradeController.checkAccepted(ctx.wizard.state.contactData.UUID, ctx.wizard.state.contactData.userid);
-        if (checkResponse.length == 0){
-            ctx.reply('Оцени драйверы к росту фундаментала:', Keyboards.insertGrade());
-            return ctx.wizard.next();
+        let idea = await strategyController.getStrategyByUUID(ctx.wizard.state.contactData.UUID);
+        if (idea[0].approved != true){
+            let checkResponse = await gradeController.checkAccepted(ctx.wizard.state.contactData.UUID, ctx.wizard.state.contactData.userid);
+            if (checkResponse.length == 0){
+                ctx.reply('Оцени драйверы к росту фундаментала:', Keyboards.insertGrade());
+                return ctx.wizard.next();
+            }
+            else {
+                ctx.reply('Вы уже оценили эту идею!');
+                return ctx.scene.leave();
+            }
         }
         else {
-            ctx.reply('Вы уже оценили эту идею!');
+            ctx.reply('Решение по этой идеи принято.')
             return ctx.scene.leave();
         }
     },
@@ -105,7 +112,7 @@ const gradeDataWizard = new WizardScene(
             ctx.reply('Отправка идеи отменена.')
         }
         return ctx.scene.leave();
-    },)
+    },);
 
 
 module.exports = { gradeDataWizard }

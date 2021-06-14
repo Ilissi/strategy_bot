@@ -18,10 +18,10 @@ async function createDatabase(){
             "source VARCHAR(255) NOT NULL, " +
             "ticker VARCHAR(255) NOT NULL, " +
             "order_type VARCHAR(255) NOT NULL, " +
-            "entry_price DECIMAL NOT NULL, " +
+            "entry_price VARCHAR(255) NOT NULL, " +
             "percent DECIMAL NOT NULL, " +
-            "TP DECIMAL NOT NULL, " +
-            "SL DECIMAL NOT NULL,  " +
+            "TP VARCHAR(255) NOT NULL, " +
+            "SL VARCHAR(255) NOT NULL,  " +
             "timemodifier VARCHAR(255) NOT NULL, "+
             "risk INTEGER NOT NULL, " +
             "id_telegram INTEGER NOT NULL," +
