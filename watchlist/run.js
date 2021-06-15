@@ -4,11 +4,11 @@ const alertBot = require('../watchlist/alertBot')
 
 
 function getPercentBuy(yahooValue, ideaObject){
+    console.log(ideaObject)
+    console.log(yahooValue)
     if (ideaObject.includes('-')){
         ideaObject = ideaObject.split('-')[1]; /*При покупке отталкиваемся от нижней цены диапазона*/
     }
-    console.log(ideaObject)
-    console.log(yahooValue)
     let percent = (((ideaObject/yahooValue) * 100) - 100).toFixed();
     if (percent >= 15) return true;
     else return false;
