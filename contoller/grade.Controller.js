@@ -24,6 +24,7 @@ class gradeController {
             countManagers = await userController.getUsers('Аналитик');
             author = await strategyController.getStrategyByUUID(strategy_id);
             if (await userController.checkPermission(author[0].id_telegram, 'Аналитик')){
+
                 if (countGrades.rowCount == countManagers.length-1) {
                     return true;
                 }
