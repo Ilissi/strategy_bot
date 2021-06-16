@@ -1,6 +1,7 @@
 const Telegraf = require('telegraf')
 const session = require('telegraf/session')
 const Stage = require('telegraf/stage')
+const fs = require( "fs" );
 
 require('dotenv').config()
 
