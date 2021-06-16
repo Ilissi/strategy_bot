@@ -1,8 +1,6 @@
 const Telegraf = require('telegraf')
 const session = require('telegraf/session')
 const Stage = require('telegraf/stage')
-const express = require('express')
-const https = require( "https" );
 const fs = require( "fs" );
 
 require('dotenv').config()
@@ -130,21 +128,12 @@ bot.action(/average (.+)/, async (ctx) =>{
     ctx.scene.enter('generate_watchlist');
 });
 
-
-
-
-
-httpsOptions = {
+let tlsOptions = {
     key: fs.readFileSync("/etc/letsencrypt/live/analytics-research-bot.ru/privkey.pem"),
     cert: fs.readFileSync("/etc/letsencrypt/live/analytics-research-bot.ru/fullchain.pem")
-}
-const app = express()
-bot.telegram.setWebhook('https://analytics-research-bot.ru/about')
+
+};
 
 
-app.use(bot.webhookCallback('/about'))
-app.listen(3000, () => {
-    console.log('App listening on port 3000!')
-})
-
-https.createServer(httpsOptions, app).listen(3000);
+bot.telegram.setWebhook('https://analytics-research-bot.ru/about');
+bot.startWebhook('/about', tlsOptions, 3000);
