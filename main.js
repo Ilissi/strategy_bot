@@ -1,6 +1,7 @@
 const Telegraf = require('telegraf')
 const session = require('telegraf/session')
 const Stage = require('telegraf/stage')
+const express = require('express')
 
 require('dotenv').config()
 
@@ -129,3 +130,12 @@ bot.action(/average (.+)/, async (ctx) =>{
 
 
 bot.telegram.setWebhook('https://analytics-research-bot.ru/about')
+
+
+const app = express()
+app.get('/', (req, res) => res.send('Hello World!'))
+// Set the bot API endpoint
+app.use(bot.webhookCallback('/about'))
+app.listen(3000, () => {
+    console.log('App listening on port 3000!')
+})
