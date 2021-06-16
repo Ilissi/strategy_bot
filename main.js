@@ -128,4 +128,4 @@ bot.action(/average (.+)/, async (ctx) =>{
 });
 
 
-bot.launch()
+bot.telegram.setWebhook('https://analytics-research-bot.ru/about')
