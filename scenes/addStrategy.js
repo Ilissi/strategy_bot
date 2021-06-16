@@ -171,14 +171,14 @@ const contactDataWizard = new WizardScene(
             ctx.wizard.state.contactData.datemessage = generate_ts.message;
             ctx.wizard.state.contactData.user_id = ctx.message.chat.id;
             ctx.wizard.state.contactData.comment = ctx.message.text;
-            let upper_message = 'Подтвердите отправку идеи:\n'
+            let upper_message = '<b>Подтвердите отправку идеи:</b>\n'
             let messageSend = messageFormat.generate_message(ctx.message.from.username, ctx.wizard.state.contactData.datemessage,ctx.wizard.state.contactData.ticker, ctx.wizard.state.contactData.type,
                 ctx.wizard.state.contactData.order, ctx.wizard.state.contactData.percent, ctx.wizard.state.contactData.price_enter, ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL,
                 ctx.wizard.state.contactData.time, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.risk, ctx.wizard.state.contactData.comment)
-            ctx.reply(upper_message + messageSend, Keyboards.acceptIdea())
+            ctx.replyWithHTML(upper_message + messageSend, Keyboards.acceptIdea())
             return ctx.wizard.next();
         } else {
-            ctx.reply('Длинна комментария меньше 30 символов, попробуйте еще раз');
+            ctx.replyWithHTML('Длина комментария меньше <b>30</b> символов, попробуйте еще раз.');
             ctx.wizard.back();  // Set the listener to the previous function
             return ctx.wizard.steps[ctx.wizard.cursor](ctx);
         }
@@ -197,6 +197,7 @@ const contactDataWizard = new WizardScene(
                 ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL, ctx.wizard.state.contactData.time, ctx.wizard.state.contactData.risk,
                 ctx.wizard.state.contactData.user_id, ctx.wizard.state.contactData.comment]
             let response = await strategyController.createStrategy(record_list);
+            console.log(response)
             if (typeof response == 'undefined'){
                 ctx.reply('Ошибка формата текста! Сообщение не отправлено!')
             }

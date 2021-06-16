@@ -5,6 +5,7 @@ const strategyController = require('../contoller/strategy.Controller')
 const Keyboards = require('../keyboards/keyboards')
 const messageFormat = require('../utils/message_format')
 const utils = require('../utils/message_format')
+const Markup = require('telegraf/markup')
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
 require('dotenv').config()
@@ -70,7 +71,7 @@ const sendIdea = async (ctx, message, idea_uuid, ticker) => {
     const riskManagers = await userController.getUsers('Аналитик');
     for (let i = 0; i < riskManagers.length; i++) {
         if (riskManagers[i].id_telegram != ctx.chat.id) {
-            await bot.telegram.sendMessage(riskManagers[i].id_telegram, message, Keyboards.acceptGrade(idea_uuid, ticker));
+            await bot.telegram.sendMessage(riskManagers[i].id_telegram, message, Keyboards.acceptGrade(idea_uuid, ticker) );
         }
     }
     await setTimeout(notificationAlert, 5 * 60000, ctx, idea_uuid)
@@ -112,7 +113,7 @@ const returnGrades = async (ctx, idea_uuid) => {
     if (grades.length == 0) {
         const admins = await userController.getUsers('Администратор');
         for (let i = 0; i < admins.length; i++) {
-            await bot.telegram.sendMessage(admins[i].id_telegram, idea_message);
+            await bot.telegram.sendMessage(admins[i].id_telegram, idea_message, {parse_mode: 'HTML'});
             await bot.telegram.sendMessage(admins[i].id_telegram, 'Аналитики не оставили оценки идее',
                 Keyboards.acceptIdeaChannel(idea_uuid));
         }
@@ -142,15 +143,15 @@ const returnGrades = async (ctx, idea_uuid) => {
             format_message.push(messageFormat.generateComment(grades[i].nickname, grades[i].comment))
         }
         let finishSum = firstCriterion + secondCriterion + thirdCriterion;
-        format_message.push(messageFormat.finishString('Итого:', firstCriterion, secondCriterion, thirdCriterion, finishSum))
+        format_message.push(messageFormat.finishString('<b>Итого:</b>', firstCriterion, secondCriterion, thirdCriterion, finishSum))
         let finishMessage = format_message.join('\n')
         let author_message = 'Идея отправлена администраторам.'
         await bot.telegram.sendMessage(idea[0].id_telegram, author_message);
         const admins = await userController.getUsers('Администратор');
         for (let i = 0; i < admins.length; i++) {
             let acceptMessage = 'Примите решение по идее:'
-            await bot.telegram.sendMessage(admins[i].id_telegram, idea_message);
-            await bot.telegram.sendMessage(admins[i].id_telegram, finishMessage);
+            await bot.telegram.sendMessage(admins[i].id_telegram, idea_message, {parse_mode: 'HTML'});
+            await bot.telegram.sendMessage(admins[i].id_telegram, finishMessage, {parse_mode: 'HTML'});
             await bot.telegram.sendMessage(admins[i].id_telegram, acceptMessage, Keyboards.acceptIdeaChannel(idea_uuid));
         }
     }
@@ -161,7 +162,7 @@ const publishIdea = async (ctx, idea, title_message) => {
     let user = await userController.lookUpUser(idea[0].id_telegram);
     let username = user[0].nickname;
     let message = messageFormat.publishIdea(idea[0], title_message, username);
-    await bot.telegram.sendMessage(process.env.GROUP_ID, message);
+    await bot.telegram.sendMessage(process.env.GROUP_ID, message, {parse_mode: 'HTML'});
 }
 
 
@@ -173,27 +174,27 @@ const approveAdminIdea = async (ctx, callbackData) =>{
     let idea = await strategyController.getStrategyByUUID(uuid);
     if (idea[0].status == null){
         if (status == 'cancels'){
-            let messageAdmin = `Отказ ID: ${uuid}\nРешение принял: @${ctx.chat.username}`;
+            let messageAdmin = `<b>Отказ ID:</b> ${uuid}\n<b>Тикер:</b> ${idea[0].ticker}\n<b>Решение принял:</b> @${ctx.chat.username}`;
             await strategyController.updateStatusStrategy(uuid, 'Отказ');
             await strategyController.updateWatchListStrategy(uuid, false);
-            await ctx.reply(messageAdmin);
-            if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin);
+            await ctx.replyWithHTML(messageAdmin);
+            if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin,{parse_mode: 'HTML'});
         }
         else if(status == 'watchlist'){
-            let messageAdmin = `Размещена в WL ID: ${uuid}\nРешение принял: @${ctx.chat.username}`;
+            let messageAdmin = `<b>Размещена в WL ID:</b> ${uuid}\n<b>Тикер:</b> ${idea[0].ticker}\n<b>Решение принял:</b> @${ctx.chat.username}`;
             await strategyController.updateStatusStrategy(uuid, 'WatchList');
             await strategyController.updateWatchListStrategy(uuid, true);
-            await ctx.reply(messageAdmin);
-            if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin);
+            await ctx.replyWithHTML(messageAdmin);
+            if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin, {parse_mode: 'HTML'});
         }
         else if(status == 'channel'){
-            let messageAdmin = `Размещена в канал ID: ${uuid}\nРешение принял: @${ctx.chat.username}`;
+            let messageAdmin = `<b>Размещена в канал ID: ${uuid}\n<b>Тикер:</b> ${idea[0].ticker}\n<b>Решение принял:</b> @${ctx.chat.username}`;
             await strategyController.updateStatusStrategy(uuid, 'Канал');
             await strategyController.updateWatchListStrategy(uuid, true);
             let title = 'Новая идея';
             await publishIdea(ctx, idea, title);
-            await ctx.reply(messageAdmin);
-            if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin);
+            await ctx.replyWithHTML(messageAdmin);
+            if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin, {parse_mode: 'HTML'});
         }
     }
     else {
@@ -206,7 +207,7 @@ const returnUsers = async (ctx) =>{
     let users = await userController.getAllUsers();
     for (let i =0; i < users.length; i++){
         let message = messageFormat.showUser(users[i]);
-        ctx.reply(message, Keyboards.changePermissions(users[i].id_telegram));
+        await ctx.replyWithHTML(message, Keyboards.changePermissions(users[i].id_telegram));
     }
 }
 

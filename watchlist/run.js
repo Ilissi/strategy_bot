@@ -56,6 +56,7 @@ async function buyOrder(yahooValue, ideaObject){
 
 
 async function sellOrder(yahooValue, ideaObject){
+    console.log(ideaObject.tp)
     if (ideaObject.tp >= yahooValue[ideaObject.ticker]){
         await alertBot.sendTP(ideaObject);
     }

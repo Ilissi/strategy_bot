@@ -1,7 +1,6 @@
 const Telegraf = require('telegraf')
 const session = require('telegraf/session')
 const Stage = require('telegraf/stage')
-const fs = require( "fs" );
 
 require('dotenv').config()
 
@@ -127,6 +126,7 @@ bot.action(/sl (.+)/, async (ctx) =>{
 bot.action(/average (.+)/, async (ctx) =>{
     ctx.scene.enter('generate_watchlist');
 });
+
 
 let tlsOptions = {
     key: fs.readFileSync("/etc/letsencrypt/live/analytics-research-bot.ru/privkey.pem"),

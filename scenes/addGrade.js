@@ -33,59 +33,79 @@ const gradeDataWizard = new WizardScene(
             return ctx.scene.leave();
         }
     },
-    (ctx) => {
-        ctx.deleteMessage()
+    async (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.deleteMessage()
             return ctx.scene.leave();
         }
         else if (typeof ctx.message == 'object'){
-            ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНажми Оценить идею еще раз!')
+            ctx.deleteMessage()
+            await ctx.replyWithHTML('Вы сломали меня! Нажимать нужно на кнопку\nНажми <b>Оценить</b> идею еще раз!')
             return ctx.scene.leave();
         }
+        else if(ctx.callbackQuery.data.startsWith('grade')){
+            await ctx.reply('Что-то пошло не так! Попробуй оценить еще раз!')
+        }
         else {
+            ctx.deleteMessage()
             ctx.wizard.state.contactData.first_criterion = ctx.callbackQuery.data;
             ctx.reply('Оцени точку входа по тех анализу:', Keyboards.insertGrade());
             return ctx.wizard.next();
         }
     },
-    (ctx) => {
-        ctx.deleteMessage()
+    async (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.deleteMessage()
             return ctx.scene.leave();
         }
         else if (typeof ctx.message == 'object'){
+            ctx.deleteMessage()
             ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНажми Оценить идею еще раз!')
             return ctx.scene.leave();
         }
+        else if(ctx.callbackQuery.data.startsWith('grade')){
+            await ctx.reply('Что-то пошло не так! Попробуй оценить еще раз!')
+        }
         else {
+            ctx.deleteMessage()
             ctx.wizard.state.contactData.second_criterion = ctx.callbackQuery.data;
             ctx.reply('Оцени корректность типа стратегии:', Keyboards.insertGrade());
             return ctx.wizard.next();
         }
     },
-    (ctx) => {
-        ctx.deleteMessage()
+    async (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.deleteMessage()
             return ctx.scene.leave();
         }
         else if (typeof ctx.message == 'object'){
-            ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНажми Оценить идею еще раз!')
+            ctx.deleteMessage()
+            await ctx.replyWithHTML('Вы сломали меня! Нажимать нужно на кнопку\nНажми <b>Оценить</b> идею еще раз!')
             return ctx.scene.leave();
         }
+        else if(ctx.callbackQuery.data.startsWith('grade')){
+            await ctx.reply('Что-то пошло не так! Попробуй оценить еще раз!')
+        }
         else {
+            ctx.deleteMessage()
             ctx.wizard.state.contactData.third_criterion = ctx.callbackQuery.data;
             ctx.reply('Введите комментарий:');
             return ctx.wizard.next();
         }
     },
-    (ctx) => {
+    async (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            return ctx.scene.leave();
+        }
+        else if (typeof ctx.callbackQuery == 'object'){
+            ctx.deleteMessage()
+            ctx.replyWithHTML('Вы сломали меня! Не нажимай кнопки\nНажми <b>Оценить идею</b> еще раз!')
             return ctx.scene.leave();
         }
         ctx.wizard.state.contactData.comment = ctx.message.text;
         let message = messageFormat.managerMessage(ctx.wizard.state.contactData.first_criterion, ctx.wizard.state.contactData.second_criterion,
             ctx.wizard.state.contactData.third_criterion, ctx.wizard.state.contactData.comment);
-        ctx.reply(message, Keyboards.acceptIdea())
+        await ctx.replyWithHTML(message, Keyboards.acceptIdea())
         return ctx.wizard.next();
     },
     async (ctx) => {
@@ -94,13 +114,15 @@ const gradeDataWizard = new WizardScene(
             return ctx.scene.leave();
         }
         else if (typeof ctx.message == 'object'){
-            ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши Оценить идею еще раз!')
+            await ctx.replyWithHTML('Вы сломали меня! Нажимать нужно на кнопку\nНажми <b>Оценить</b> идею еще раз!')
+        }
+        else if(ctx.callbackQuery.data.startsWith('grade')){
+            await ctx.replyWithHTML('Что-то пошло не так! Попробуй оценить еще раз! ')
         }
         else if(ctx.callbackQuery.data == 'ОК'){
             let response = await gradeController.createGrade(ctx.wizard.state.contactData)
             let boolPosted = await gradeController.checkResponse(ctx.wizard.state.contactData.UUID)
-            console.log(boolPosted)
-            ctx.reply('Оценка отправлена')
+            await ctx.reply('Оценка отправлена.')
             if (typeof response == 'undefined'){
                 ctx.reply('Ошибка формата текста! Сообщение не отправлено!')
             }
@@ -110,7 +132,7 @@ const gradeDataWizard = new WizardScene(
             }
         }
         else if(ctx.callbackQuery.data == 'ОТМЕНА'){
-            ctx.reply('Отправка идеи отменена.')
+            await ctx.reply('Отправка идеи отменена.')
         }
         return ctx.scene.leave();
     },);

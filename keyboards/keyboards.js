@@ -29,10 +29,10 @@ class Keyboards {
     }
 
     addUser(action, telegram_id) {
-        return Markup.inlineKeyboard([
-            [Markup.callbackButton('Аналитик', `${action} ${telegram_id} Аналитик`)],
-            [Markup.callbackButton('Администратор', `${action} ${telegram_id} Администратор`)],
-            [Markup.callbackButton('Отключить', `${action} ${telegram_id} Отключить`)]]).extra();
+        return {parse_mode: 'HTML', reply_markup:{inline_keyboard:[[{text:'Аналитик', callback_data:`${action} ${telegram_id} Аналитик`}],
+                    [{text:'Администратор', callback_data:`${action} ${telegram_id} Администратор`}],
+                    [{text:'Отключить', callback_data:`${action} ${telegram_id} Отключить`}]]}};
+
     }
 
     acceptIdea() {
@@ -51,7 +51,7 @@ class Keyboards {
     }
 
     acceptGrade(uuid, ticker){
-        return Markup.inlineKeyboard([Markup.callbackButton('Оценить идею', `grade ${uuid} ${ticker}`)]).extra();
+        return {parse_mode: 'HTML', reply_markup:{inline_keyboard:[[{text:'Оценить идею', callback_data:`grade ${uuid} ${ticker}`}]]}};
     }
 
     insertGrade(){
@@ -73,15 +73,15 @@ class Keyboards {
     }
 
     takeProfit(uuid) {
-        return Markup.inlineKeyboard([Markup.callbackButton('Зафиксировать доход', `tp ${uuid}`)]).extra();
+        return {parse_mode: 'HTML', reply_markup:{inline_keyboard:[[{text:'Зафиксировать доход', callback_data:`tp ${uuid}`}]]}};
     }
 
     stopLoss(uuid) {
-        return Markup.inlineKeyboard([Markup.callbackButton('Зафиксировать убыток', `sl ${uuid}`)]).extra();
+        return {parse_mode: 'HTML', reply_markup:{inline_keyboard:[[{text:'Зафиксировать убыток', callback_data:`sl ${uuid}`}]]}};
     }
 
     averageIdea(uuid) {
-        return Markup.inlineKeyboard([Markup.callbackButton('Усреднить идею', `average ${uuid}`)]).extra();
+        return {parse_mode: 'HTML', reply_markup:{inline_keyboard:[[{text:'Усреднить идею', callback_data:`average ${uuid}`}]]}};
     }
 
     acceptWatchlist() {

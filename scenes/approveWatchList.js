@@ -74,14 +74,14 @@ const publishWatchListWizard = new WizardScene(
                 let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],
                     ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
                 let confirm_message = upper_message + message;
-                ctx.reply(confirm_message, Keyboards.acceptWatchlist());
+                ctx.replyWithHTML(confirm_message, Keyboards.acceptWatchlist());
             }
             else if (response[0] == 'sl'){
                 ctx.wizard.state.contactData.title = 'Закрытие сделки по SL';
                 let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],
                     ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
                 let confirm_message = upper_message + message;
-                ctx.reply(confirm_message, Keyboards.acceptWatchlist());
+                ctx.replyWithHTML(confirm_message, Keyboards.acceptWatchlist());
             }
             else if (response[0] == 'average') {
                 ctx.wizard.state.contactData.title = 'Усреднение по идеи';
@@ -94,7 +94,7 @@ const publishWatchListWizard = new WizardScene(
                 let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],
                     ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
                 let confirm_message = upper_message + message;
-                ctx.reply(confirm_message, Keyboards.acceptWatchlist());
+                ctx.replyWithHTML(confirm_message, Keyboards.acceptWatchlist());
             }
         }
         return ctx.wizard.next();
@@ -108,20 +108,19 @@ const publishWatchListWizard = new WizardScene(
             let response =  ctx.wizard.state.contactData.response.split(' ');
             if (response[0] == 'average'){
                 let idea_value = ctx.wizard.state.contactData.ideaObject[0];
-                console.log(idea_value)
                 let newResponse = await strategyController.createAverageStrategy(Object.values(idea_value));
-                console.log(response)
                 await strategyController.updateApprove(false, response[1]);
                 await strategyController.updateStatusStrategy('Канал', newResponse[0].id);
                 let message = messageFormat.publishIdea(idea_value,
                     ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
-                await bot.telegram.sendMessage(process.env.GROUP_ID, message);
+                await bot.telegram.sendMessage(process.env.GROUP_ID, message,{parse_mode: 'HTML'});
                 await ctx.reply('Сообщение отправлено в канал.')
             }
             else {
                 let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],
                     ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
-                await bot.telegram.sendMessage(process.env.GROUP_ID, message);
+                await bot.telegram.sendMessage(process.env.GROUP_ID, message, {parse_mode: 'HTML'});
+                await strategyController.updateApprove(false, response[1]);
                 await ctx.reply('Сообщение отправлено в канал.')
             }
         }

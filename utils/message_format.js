@@ -22,21 +22,21 @@ function returnFormat(TP, SL){
 
 function generate_message(username, ts, ticket, strategy, order, percent, entry_price, TP, SL, timemodifier, source, grade, comment) {
     let getFormat = returnFormat(TP, SL);
-    let message = `@${username} ${ts}\nТикер: ${ticket}\nСтратегия: ${strategy}\n#${order} ${percent}%\nЦена входа: ${entry_price}$\nTP: ${getFormat.TP}   SL: ${getFormat.SL}\nСрок:  ${timemodifier}\nИсточник:  ${source}\nРиск:  ${grade}/5\nКомментарий: ${comment}`;
+    let message = `@${username} ${ts}\n<b>Тикер:</b> ${ticket}\n<b>Стратегия:</b> ${strategy}\n#${order} ${percent}%\n<b>Цена входа:</b> ${entry_price}$\n<b>TP:</b> ${getFormat.TP}   <b>SL:</b> ${getFormat.SL}\n<b>Срок:</b>  ${timemodifier}\n<b>Источник:</b>  ${source}\n<b>Риск:</b>  ${grade}/5\n<b>Комментарий:</b> ${comment}`;
     return message
 }
 
 
 function generate_message_alert(UUID, ticket, strategy, order, percent, entry_price, TP, SL, timemodifier, source, grade, comment) {
     let getFormat = returnFormat(TP, SL);
-    let message = `UUID: ${UUID} \nТикер: ${ticket}\nСтратегия: ${strategy}\n#${order} ${percent}%\nЦена входа: ${entry_price}$\nTP: ${getFormat.TP}   SL: ${getFormat.SL}\nСрок:  ${timemodifier}\nИсточник:  ${source}\nРиск:  ${grade}/5\nКомментарий: ${comment}`;
+    let message = `<b>UUID:</b> ${UUID} \n<b>Тикер:</b> ${ticket}\n<b>Стратегия:</b> ${strategy}\n#${order} ${percent}%\n<b>Цена входа:</b> ${entry_price}$\n<b>TP:</b> ${getFormat.TP}   <b>SL:</b> ${getFormat.SL}\n<b>Срок:</b>  ${timemodifier}\n<b>Источник:</b>   ${source}\n<b>Риск:</b>  ${grade}/5\n<b>Комментарий:</b> ${comment}`;
     return message
 }
 
 
 function managerMessage(first_criterion, second_criterion, third_criterion, comment){
     let summary = Number(first_criterion) + Number(second_criterion) + Number(third_criterion);
-    let message = `Драйверы к росту фундаменталу: ${first_criterion}\nТочка входа по тех анализу: ${second_criterion}\nКорректность типа стратегии: ${third_criterion}\nИтоговоя оценка: ${summary} из 30\nКоментарий: ${comment}`;
+    let message = `<b>Драйверы к росту фундаменталу:</b> ${first_criterion}\n<b>Точка входа по тех анализу:</b> ${second_criterion}\n<b>Корректность типа стратегии:</b> ${third_criterion}\n<b>Итоговоя оценка:</b> ${summary} из 30\n<b>Коментарий:</b> ${comment}`;
     return message;
 }
 
@@ -86,23 +86,23 @@ function finishString(username, firstCriterion, secondCriterion, thirdCriterion,
 
 
 function generateComment(username, comment){
-    return `\n${username}: \n${comment} `
+    return `\n@${username}: \n${comment} `
 }
 
 
 function publishIdea(idea, title, username){
     let getFormat = returnFormat(idea.tp, idea.sl);
-    return `${title}\n@${username} \nТикер: ${idea.ticker}\nСтратегия: ${idea.type}\n#${idea.order_type} ${idea.percent}%\nЦена входа: ${idea.entry_price}$\nTP: ${getFormat.TP}   SL: ${getFormat.SL}\nСрок:  ${idea.timemodifier}\nИсточник:  ${idea.source}\nРиск:  ${idea.risk}/5\nКомментарий: ${idea.comment}`;
+    return `<b>${title}</b>\n@${username} \n<b>Тикер:</b> ${idea.ticker}\n<b>Стратегия:</b> ${idea.type}\n#${idea.order_type} ${idea.percent}%\n<b>Цена входа:</b> ${idea.entry_price}$\n<b>TP:</b> ${getFormat.TP}   <b>SL:</b> ${getFormat.SL}\n<b>Срок:</b>  ${idea.timemodifier}\n<b>Источник:</b>  ${idea.source}\n<b>Риск:</b>  ${idea.risk}/5\n<b>Комментарий:</b> ${idea.comment}`;
 }
 
 
 function searchIdea(username, idea){
     let getFormat = returnFormat(idea.tp, idea.sl);
-    return `UUID: ${idea.id}\n@${username} \nТикер: ${idea.ticker}\nСтратегия: ${idea.type}\n#${idea.order_type} ${idea.percent}%\nЦена входа: ${idea.entry_price}$\nTP: ${getFormat.TP}   SL: ${getFormat.SL}\nСрок:  ${idea.timemodifier}\nИсточник:  ${idea.source}\nРиск:  ${idea.risk}/5\nКомментарий: ${idea.comment}\nСтатус: ${idea.status}`;
+    return `<b>UUID:</b> ${idea.id}\n@${username} \n<b>Тикер:</b> ${idea.ticker}\n<b>Стратегия:</b> ${idea.type}\n#${idea.order_type} ${idea.percent}%\n<b>Цена входа:</b> ${idea.entry_price}$\n<b>TP:</b> ${getFormat.TP}   <b>SL:</b> ${getFormat.SL}\n<b>Срок:</b>  ${idea.timemodifier}\n<b>Источник:</b>  ${idea.source}\n<b>Риск:</b>  ${idea.risk}/5\n<b>Комментарий:</b> ${idea.comment}\n<b>Статус:</b> ${idea.status}`;
 }
 
 function showUser(user){
-    return `Пользователь: @${user.nickname}\nПрава: ${user.permissions}`
+    return `<b>Пользователь:</b> @${user.nickname}\n<b>Права:</b> ${user.permissions}`
 }
 
 
