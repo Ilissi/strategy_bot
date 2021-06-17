@@ -23,7 +23,7 @@ const searchIdeaWizard = new WizardScene(
             for (let i = 0; i < ideas.length; i++) {
                 let user = await userController.lookUpUser(ideas[i].id_telegram);
                 let message = messageFormat.searchIdea(user[0].nickname, ideas[i]);
-                await bot.telegram.sendMessage(user_id, message)
+                await bot.telegram.sendMessage(user_id, message, {parse_mode: 'HTML'})
             }
         }
         return ctx.scene.leave();
