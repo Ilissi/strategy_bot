@@ -31,14 +31,6 @@ function updateParameters(order_type, ideaObject){
         }
         else return (ideaObject * percentDown).toFixed(2);
     }
-    else if (order_type == 'Sell'){
-        let percentUp = 1.15;
-        if (ideaObject.includes('-')){
-            let diapason = updateDiapason(percentUp, ideaObject)
-            return diapason;
-        }
-        else return (ideaObject * percentUp).toFixed(2);
-    }
 }
 
 

@@ -7,17 +7,7 @@ function getPercentBuy(yahooValue, ideaObject){
     if (ideaObject.indexOf('-')){
         ideaObject = ideaObject.split('-')[0]; /*При покупке отталкиваемся от нижней цены диапазона*/
     }
-    let percent = Math.abs(((ideaObject/yahooValue) * 100) - 100).toFixed();
-    if (percent >= 15) return true;
-    else return false;
-}
-
-
-function getPercentSell(yahooValue, ideaObject){
-    if (ideaObject.includes('-')){
-        ideaObject = ideaObject.split('-')[1]; /*При продаже отталкиваемся от верхней цены диапазона*/
-    }
-    let percent = (((yahooValue/ideaObject) * 100) - 100).toFixed();
+    let percent = (((ideaObject/yahooValue) * 100) - 100).toFixed();
     if (percent >= 15) return true;
     else return false;
 }
@@ -56,15 +46,11 @@ async function buyOrder(yahooValue, ideaObject){
 
 
 async function sellOrder(yahooValue, ideaObject){
-    console.log(ideaObject.tp)
     if (ideaObject.tp >= yahooValue[ideaObject.ticker]){
         await alertBot.sendTP(ideaObject);
     }
     else if (ideaObject.sl <= yahooValue[ideaObject.ticker]){
         await alertBot.sendSL(ideaObject);
-    }
-    else if (getPercentSell(yahooValue[ideaObject.ticker], ideaObject.entry_price) == true){
-        await alertBot.averageIdea(ideaObject);
     }
 }
 

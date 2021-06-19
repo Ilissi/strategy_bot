@@ -76,6 +76,16 @@ class userController {
 
     async getAllUsers() {
         try {
+            let response = await db.query("SELECT id_telegram FROM users WHERE permissions='Аналитик' OR permissions='Администратор'");
+            return response.rows;
+        }
+        catch (error){
+            return error;
+        }
+    }
+
+    async getAllUsersAllParam() {
+        try {
             let response = await db.query('SELECT * FROM users');
             return response.rows;
         }

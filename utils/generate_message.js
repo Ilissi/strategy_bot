@@ -4,8 +4,8 @@ const gradeController = require('../contoller/grade.Controller')
 const strategyController = require('../contoller/strategy.Controller')
 const Keyboards = require('../keyboards/keyboards')
 const messageFormat = require('../utils/message_format')
-const utils = require('../utils/message_format')
-const Markup = require('telegraf/markup')
+
+
 
 const bot = new Telegraf(process.env.BOT_TOKEN)
 require('dotenv').config()
@@ -34,7 +34,7 @@ async function userRegister (ctx, user_id, permissions, admin_id, message, notif
     }
     ctx.deleteMessage();
     await notificationAdmin(ctx, user_id, admin_id, notification_message);
-    ctx.reply('Действие подтверждено!');
+    await ctx.reply('Действие подтверждено!');
 }
 
 
@@ -68,27 +68,27 @@ const notificationAdmin = async (ctx, user_id, admin_id, notification_message) =
 
 
 const sendIdea = async (ctx, message, idea_uuid, ticker) => {
-    const riskManagers = await userController.getUsers('Аналитик');
-    for (let i = 0; i < riskManagers.length; i++) {
-        if (riskManagers[i].id_telegram != ctx.chat.id) {
-            await bot.telegram.sendMessage(riskManagers[i].id_telegram, message, Keyboards.acceptGrade(idea_uuid, ticker) );
+    const users = await userController.getAllUsers();
+    for (let i = 0; i < users.length; i++) {
+        if (users[i].id_telegram != ctx.chat.id) {
+            await bot.telegram.sendMessage(users[i].id_telegram, message, Keyboards.acceptGrade(idea_uuid, ticker) );
         }
     }
-    await setTimeout(notificationAlert, 5 * 60000, ctx, idea_uuid)
-    await setTimeout(notificationFinish, 20 * 60000, ctx, idea_uuid)
+    await setTimeout(notificationAlert, 1 * 60000, ctx, idea_uuid)
+    await setTimeout(notificationFinish, 2 * 60000, ctx, idea_uuid)
 }
 
 
 const notificationAlert = async (ctx, idea_uuid) => {
     const getStrategyApprove = await strategyController.checkApprove(idea_uuid);
     if (getStrategyApprove.length == 0) {
-        const riskManagers = await userController.getUsers('Аналитик');
-        const approveRiskManagers = await gradeController.returnManagersApproved(idea_uuid)
-        let alertManager = utils.generateList(riskManagers, approveRiskManagers)
+        const users = await userController.getAllUsers();
+        const approveUsers = await gradeController.returnApproved(idea_uuid)
+        let alertUsers = messageFormat.generateList(users, approveUsers)
         let message = 'Осталось 15 минут для оценки идеи'
-        for (let i = 0; i < alertManager.length; i++) {
-            if (alertManager[i].id_telegram != ctx.chat.id) {
-                await bot.telegram.sendMessage(alertManager[i].id_telegram, message)
+        for (let i = 0; i < alertUsers.length; i++) {
+            if (alertUsers[i].id_telegram != ctx.chat.id) {
+                await bot.telegram.sendMessage(alertUsers[i].id_telegram, message)
             }
         }
     }
@@ -107,43 +107,38 @@ const notificationFinish = async (ctx, idea_uuid) => {
 const returnGrades = async (ctx, idea_uuid) => {
     const grades = await gradeController.returnGrades(idea_uuid);
     const idea = await strategyController.getStrategyByUUID(idea_uuid);
-    let idea_message = messageFormat.generate_message_alert(idea_uuid, idea[0].ticker, idea[0].type, idea[0].order_type,
-        idea[0].percent, idea[0].entry_price, idea[0].tp, idea[0].sl, idea[0].timemodifier, idea[0].source, idea[0].risk,
-        idea[0].comment);
+    let user = await userController.lookUpUser(idea[0].id_telegram)
+    let idea_message = messageFormat.generate_message(idea_uuid.toString(), user[0].nickname, idea[0].ticker, idea[0].url, idea[0].type, idea[0].order_type,
+        idea[0].entry_price, idea[0].tp, idea[0].sl, idea[0].source, idea[0].comment);
     if (grades.length == 0) {
         const admins = await userController.getUsers('Администратор');
         for (let i = 0; i < admins.length; i++) {
             await bot.telegram.sendMessage(admins[i].id_telegram, idea_message, {parse_mode: 'HTML'});
-            await bot.telegram.sendMessage(admins[i].id_telegram, 'Аналитики не оставили оценки идее',
+            await bot.telegram.sendMessage(admins[i].id_telegram, 'Никто не оставили оценки идее',
                 Keyboards.acceptIdeaChannel(idea_uuid));
         }
     }
     else {
-        const riskManagers = await userController.getUsers('Аналитик');
+        const users = await userController.getAllUsers();
         let format_message = []
-        if (await userController.checkPermission(idea[0].id_telegram, 'Аналитик')) {
-            format_message.push(messageFormat.generateFinishMessage(grades.length, riskManagers.length - 1));
-            format_message.push(messageFormat.generateTitle());
-        } else {
-            format_message.push(messageFormat.generateFinishMessage(grades.length, riskManagers.length));
-            format_message.push(messageFormat.generateTitle());
-        }
+        format_message.push(messageFormat.generateFinishMessage(grades.length, users.length - 1));
         let firstCriterion = 0;
         let secondCriterion = 0;
-        let thirdCriterion = 0;
         for (let i = 0; i < grades.length; i++) {
-            let sum_string = grades[i].first_criterion + grades[i].second_criterion + grades[i].third_criterion;
-            format_message.push(messageFormat.generateString(grades[i].nickname, grades[i].first_criterion,
-                grades[i].second_criterion, grades[i].third_criterion, sum_string));
             firstCriterion += grades[i].first_criterion;
             secondCriterion += grades[i].second_criterion;
-            thirdCriterion += grades[i].third_criterion;
         }
+        let order = await gradeController.CheckOrder(idea_uuid)
+        let portfolio = await gradeController.CheckPortfolio(idea_uuid);
+        format_message.push(messageFormat.generateString('Оценка торговой идеи:',(firstCriterion/grades.length).toFixed(1)));
+        format_message.push(messageFormat.generateString('Оценка точки входа:',(secondCriterion/grades.length).toFixed(1)));
+        format_message.push(messageFormat.generateStringSummary('Соответствие портфель:', order.length, grades.length))
+        format_message.push(messageFormat.generateStringSummary('Сколько возьмут себе:', portfolio.length, grades.length))
         for (let i = 0; i < grades.length; i++) {
             format_message.push(messageFormat.generateComment(grades[i].nickname, grades[i].comment))
+            format_message.push(messageFormat.generatePrice(grades[i].price_entity))
+
         }
-        let finishSum = firstCriterion + secondCriterion + thirdCriterion;
-        format_message.push(messageFormat.finishString('<b>Итого:</b>', firstCriterion, secondCriterion, thirdCriterion, finishSum))
         let finishMessage = format_message.join('\n')
         let author_message = 'Идея отправлена администраторам.'
         await bot.telegram.sendMessage(idea[0].id_telegram, author_message);
@@ -167,34 +162,23 @@ const publishIdea = async (ctx, idea, title_message) => {
 
 
 const approveAdminIdea = async (ctx, callbackData) =>{
-    ctx.deleteMessage();
     let response = callbackData.split(' ');
     let uuid = response[1];
     let status = response[0];
     let idea = await strategyController.getStrategyByUUID(uuid);
     if (idea[0].status == null){
         if (status == 'cancels'){
-            let messageAdmin = `<b>Отказ ID:</b> ${uuid}\n<b>Тикер:</b> ${idea[0].ticker}\n<b>Решение принял:</b> @${ctx.chat.username}`;
+            let messageAdmin = `<b>Отказ </b> <b>№${messageFormat.PrefInt(uuid, 4)}</b>\n<b>Тикер:</b> 💼 <a href="${idea[0].url}">${idea[0].ticker}</a>\n<b>Решение принял:</b> @${ctx.chat.username}`;
             await strategyController.updateStatusStrategy(uuid, 'Отказ');
             await strategyController.updateWatchListStrategy(uuid, false);
             await ctx.replyWithHTML(messageAdmin);
             if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin,{parse_mode: 'HTML'});
         }
         else if(status == 'watchlist'){
-            let messageAdmin = `<b>Размещена в WL ID:</b> ${uuid}\n<b>Тикер:</b> ${idea[0].ticker}\n<b>Решение принял:</b> @${ctx.chat.username}`;
-            await strategyController.updateStatusStrategy(uuid, 'WatchList');
-            await strategyController.updateWatchListStrategy(uuid, true);
-            await ctx.replyWithHTML(messageAdmin);
-            if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin, {parse_mode: 'HTML'});
+            await ctx.scene.enter('admin_accept');
         }
         else if(status == 'channel'){
-            let messageAdmin = `<b>Размещена в канал ID: ${uuid}\n<b>Тикер:</b> ${idea[0].ticker}\n<b>Решение принял:</b> @${ctx.chat.username}`;
-            await strategyController.updateStatusStrategy(uuid, 'Канал');
-            await strategyController.updateWatchListStrategy(uuid, true);
-            let title = 'Новая идея';
-            await publishIdea(ctx, idea, title);
-            await ctx.replyWithHTML(messageAdmin);
-            if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin, {parse_mode: 'HTML'});
+            await ctx.scene.enter('admin_accept')
         }
     }
     else {
@@ -204,7 +188,7 @@ const approveAdminIdea = async (ctx, callbackData) =>{
 
 
 const returnUsers = async (ctx) =>{
-    let users = await userController.getAllUsers();
+    let users = await userController.getAllUsersAllParam();
     for (let i =0; i < users.length; i++){
         let message = messageFormat.showUser(users[i]);
         await ctx.replyWithHTML(message, Keyboards.changePermissions(users[i].id_telegram));
@@ -250,5 +234,16 @@ function checkDigit(message) {
 }
 
 
-module.exports = { registerUser, updateUser, sendIdea, returnGrades, publishIdea,
+function returnId(idIdea){
+    let record;
+    if (typeof idIdea[0] == 'undefined') {
+        record = '1'
+    }
+    else {
+        record = (parseInt(idIdea[0].id) + 1).toString();
+    }
+    return record;
+}
+
+module.exports = { registerUser, updateUser, sendIdea, returnGrades, publishIdea, returnId,
     checkMessage, approveAdminIdea, returnUsers, checkDigitDiapason, checkDigit }

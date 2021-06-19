@@ -1,6 +1,7 @@
 const WizardScene = require('telegraf/scenes/wizard')
 
 const strategyController = require('../contoller/strategy.Controller')
+
 const Keyboards = require('../keyboards/keyboards')
 const messageFormat = require('../utils/message_format')
 const generateMessage = require('../utils/generate_message')
@@ -14,9 +15,10 @@ const contactDataWizard = new WizardScene(
         ctx.wizard.state.contactData = {};
         return ctx.wizard.next();
     },
-    (ctx) => {
+    async (ctx) => {
         ctx.deleteMessage()
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.reply('Отмена')
             return ctx.scene.leave();
         }
         else if (typeof ctx.message == 'object'){
@@ -31,6 +33,8 @@ const contactDataWizard = new WizardScene(
     },
     (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.deleteMessage()
+            ctx.reply('Отмена')
             return ctx.scene.leave();
         }
         else if (typeof ctx.message == 'object'){
@@ -39,7 +43,7 @@ const contactDataWizard = new WizardScene(
         }
         else if (ctx.callbackQuery.data == 'Платный источник') {
             ctx.deleteMessage()
-            ctx.reply('Введите ссылку на платный источник:')
+            ctx.reply('Название источника')
 
         }
         else if (ctx.callbackQuery.data == 'Личная') {
@@ -51,6 +55,8 @@ const contactDataWizard = new WizardScene(
     },
     (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.deleteMessage()
+            ctx.reply('Отмена')
             return ctx.scene.leave();
         }
         else if (ctx.updateType == 'message'){
@@ -64,15 +70,19 @@ const contactDataWizard = new WizardScene(
     },
     (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.deleteMessage()
+            ctx.reply('Отмена')
             return ctx.scene.leave();
         }
         ctx.wizard.state.contactData.ticker = ctx.message.text;
+        ctx.wizard.state.contactData.url = `https://finviz.com/quote.ashx?t=${ctx.wizard.state.contactData.ticker}`;
         ctx.reply('Какое действие?', Keyboards.getOrder());
         return ctx.wizard.next();
     },
     (ctx) => {
         ctx.deleteMessage()
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.reply('Отмена')
             return ctx.scene.leave();
         }
         else if (typeof ctx.message == 'object'){
@@ -81,17 +91,19 @@ const contactDataWizard = new WizardScene(
         }
         else {
             ctx.wizard.state.contactData.order = ctx.callbackQuery.data;
-            ctx.reply('Введите цену входа:');
+            ctx.reply('🟢Вход');
             return ctx.wizard.next();
         }
     },
     (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.deleteMessage()
+            ctx.reply('Отмена')
             return ctx.scene.leave();
         }
         else if(generateMessage.checkDigitDiapason(ctx.message.text)) {
             ctx.wizard.state.contactData.price_enter = ctx.message.text;
-            ctx.reply('Введите долю портфеля:');
+            ctx.reply('🟠Цель');
             return ctx.wizard.next();
         }
         else {
@@ -101,35 +113,13 @@ const contactDataWizard = new WizardScene(
     },
     (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
-            return ctx.scene.leave();
-        }
-        ctx.wizard.state.contactData.percent = ctx.message.text;
-        ctx.reply('Оцените риск стратегии:', Keyboards.riskKeyboard())
-        return ctx.wizard.next();
-    },
-    (ctx) => {
-        ctx.deleteMessage()
-        if (generateMessage.checkMessage(ctx, ctx.message) == true){
-            return ctx.scene.leave();
-        }
-        else if (typeof ctx.message == 'object'){
-            ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши /add еще раз!')
-            return ctx.scene.leave();
-        }
-        else {
-            generateMessage.checkMessage(ctx, ctx.message);
-            ctx.wizard.state.contactData.risk = ctx.callbackQuery.data;
-            ctx.reply('Введите TP:');
-            return ctx.wizard.next();
-        }
-    },
-    (ctx) => {
-        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.deleteMessage()
+            ctx.reply('Отмена')
             return ctx.scene.leave();
         }
         else if(generateMessage.checkDigit(ctx.message.text)) {
             ctx.wizard.state.contactData.TP = ctx.message.text;
-            ctx.reply('Введите SL:');
+            ctx.reply('🔴Стоп');
             return ctx.wizard.next();
         }
         else {
@@ -139,30 +129,29 @@ const contactDataWizard = new WizardScene(
     },
     (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.deleteMessage()
+            ctx.reply('Отмена')
             return ctx.scene.leave();
         }
-        else if(generateMessage.checkDigit(ctx.message.text)) {
-            ctx.wizard.state.contactData.SL = ctx.message.text;
-            ctx.reply('Срок:');
-            return ctx.wizard.next();
+        else if (typeof ctx.wizard.state.contactData.SL == 'undefined') {
+            if(generateMessage.checkDigit(ctx.message.text)) {
+                ctx.wizard.state.contactData.SL = ctx.message.text;
+                ctx.reply('Опишите торговую идею:');
+                return ctx.wizard.next();
+            }
+            else {
+                ctx.reply('Ошибка формата текста');
+                return ctx.scene.leave();
+            }
         }
         else {
-            ctx.reply('Ошибка формата текста');
-            return ctx.scene.leave();
+            return ctx.wizard.next();
         }
     },
-    (ctx) => {
+    async (ctx) => {
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
-            return ctx.scene.leave();
-        }
-        else if (typeof  ctx.wizard.state.contactData.time == 'undefined') {
-            ctx.wizard.state.contactData.time = ctx.message.text;
-        }
-        ctx.reply('Введите комментарий:');
-        return ctx.wizard.next();
-    },
-    (ctx) => {
-        if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.deleteMessage()
+            ctx.reply('Отмена')
             return ctx.scene.leave();
         }
         else if (ctx.message.text.length > 30) {
@@ -171,10 +160,12 @@ const contactDataWizard = new WizardScene(
             ctx.wizard.state.contactData.datemessage = generate_ts.message;
             ctx.wizard.state.contactData.user_id = ctx.message.chat.id;
             ctx.wizard.state.contactData.comment = ctx.message.text;
+            let idIdea = await strategyController.getLastRecord();
+            let record = generateMessage.returnId(idIdea);
             let upper_message = '<b>Подтвердите отправку идеи:</b>\n'
-            let messageSend = messageFormat.generate_message(ctx.message.from.username, ctx.wizard.state.contactData.datemessage,ctx.wizard.state.contactData.ticker, ctx.wizard.state.contactData.type,
-                ctx.wizard.state.contactData.order, ctx.wizard.state.contactData.percent, ctx.wizard.state.contactData.price_enter, ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL,
-                ctx.wizard.state.contactData.time, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.risk, ctx.wizard.state.contactData.comment)
+            let messageSend = messageFormat.generate_message(record, ctx.message.from.username, ctx.wizard.state.contactData.ticker,
+                ctx.wizard.state.contactData.url, ctx.wizard.state.contactData.type, ctx.wizard.state.contactData.order, ctx.wizard.state.contactData.price_enter,
+                ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.comment)
             ctx.replyWithHTML(upper_message + messageSend, Keyboards.acceptIdea())
             return ctx.wizard.next();
         } else {
@@ -186,27 +177,26 @@ const contactDataWizard = new WizardScene(
     async (ctx) => {
         ctx.deleteMessage()
         if (generateMessage.checkMessage(ctx, ctx.message) == true){
+            ctx.reply('Отмена')
             return ctx.scene.leave();
         }
         else if (typeof ctx.message == 'object'){
             ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nНапиши /add еще раз!')
         }
         else if(ctx.callbackQuery.data == 'ОК'){
-            let record_list = [ctx.wizard.state.contactData.type, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.ticker,
-                ctx.wizard.state.contactData.order, ctx.wizard.state.contactData.price_enter, ctx.wizard.state.contactData.percent,
-                ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL, ctx.wizard.state.contactData.time, ctx.wizard.state.contactData.risk,
+            let record_list = [ctx.wizard.state.contactData.type, ctx.wizard.state.contactData.url, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.ticker,
+                ctx.wizard.state.contactData.order, ctx.wizard.state.contactData.price_enter, ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL,
                 ctx.wizard.state.contactData.user_id, ctx.wizard.state.contactData.comment]
             let response = await strategyController.createStrategy(record_list);
-            console.log(response)
             if (typeof response == 'undefined'){
                 ctx.reply('Ошибка формата текста! Сообщение не отправлено!')
             }
             else {
-                let messageSend = messageFormat.generate_message(ctx.callbackQuery.from.username, ctx.wizard.state.contactData.datemessage,ctx.wizard.state.contactData.ticker, ctx.wizard.state.contactData.type,
-                    ctx.wizard.state.contactData.order, ctx.wizard.state.contactData.percent, ctx.wizard.state.contactData.price_enter, ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL,
-                    ctx.wizard.state.contactData.time, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.risk, ctx.wizard.state.contactData.comment)
+                let messageSend = messageFormat.generate_message((response[0].id).toString(), ctx.callbackQuery.from.username, ctx.wizard.state.contactData.ticker,
+                    ctx.wizard.state.contactData.url, ctx.wizard.state.contactData.type, ctx.wizard.state.contactData.order, ctx.wizard.state.contactData.price_enter,
+                    ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.comment)
                 await generateMessage.sendIdea(ctx, messageSend, response[0].id, ctx.wizard.state.contactData.ticker)
-                ctx.reply('Идея отправлена аналитикам.')
+                ctx.reply('Идея отправлена на оценку.')
             }
         }
         else if(ctx.callbackQuery.data == 'ОТМЕНА'){

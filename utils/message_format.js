@@ -20,23 +20,30 @@ function returnFormat(TP, SL){
 }
 
 
-function generate_message(username, ts, ticket, strategy, order, percent, entry_price, TP, SL, timemodifier, source, grade, comment) {
+function PrefInt(number, len) {
+    if (number.length < len)
+    {
+        return (Array(len).join('0') + number).slice(-len);
+    }
+}
+
+
+function generate_message(recordNumber, username, ticket, url, strategy, order, entry_price, TP, SL, source, comment) {
     let getFormat = returnFormat(TP, SL);
-    let message = `@${username} ${ts}\n<b>Тикер:</b> ${ticket}\n<b>Стратегия:</b> ${strategy}\n#${order} ${percent}%\n<b>Цена входа:</b> ${entry_price}$\n<b>TP:</b> ${getFormat.TP}   <b>SL:</b> ${getFormat.SL}\n<b>Срок:</b>  ${timemodifier}\n<b>Источник:</b>  ${source}\n<b>Риск:</b>  ${grade}/5\n<b>Комментарий:</b> ${comment}`;
+    let message = `<b>№${PrefInt(recordNumber, 4)}</b> @${username}\n💼 <a href="${url}">${ticket}</a>\n<b>🟢 Вход:</b> ${entry_price}$\n<b>🟠 Цель:</b> ${getFormat.TP}\n<b>🔴 Стоп:</b> ${getFormat.SL}\n<b>Стратегия:</b> ${strategy}\n<b>Тип:</b> ${order}\n<b>Источник:</b> ${source}\n<b>Комментарий:</b> ${comment}`;
     return message
 }
 
 
-function generate_message_alert(UUID, ticket, strategy, order, percent, entry_price, TP, SL, timemodifier, source, grade, comment) {
-    let getFormat = returnFormat(TP, SL);
-    let message = `<b>UUID:</b> ${UUID} \n<b>Тикер:</b> ${ticket}\n<b>Стратегия:</b> ${strategy}\n#${order} ${percent}%\n<b>Цена входа:</b> ${entry_price}$\n<b>TP:</b> ${getFormat.TP}   <b>SL:</b> ${getFormat.SL}\n<b>Срок:</b>  ${timemodifier}\n<b>Источник:</b>   ${source}\n<b>Риск:</b>  ${grade}/5\n<b>Комментарий:</b> ${comment}`;
-    return message
-}
-
-
-function managerMessage(first_criterion, second_criterion, third_criterion, comment){
-    let summary = Number(first_criterion) + Number(second_criterion) + Number(third_criterion);
-    let message = `<b>Драйверы к росту фундаменталу:</b> ${first_criterion}\n<b>Точка входа по тех анализу:</b> ${second_criterion}\n<b>Корректность типа стратегии:</b> ${third_criterion}\n<b>Итоговоя оценка:</b> ${summary} из 30\n<b>Коментарий:</b> ${comment}`;
+function managerMessage(first_criterion, second_criterion, entry_price, portfolio, comment, type){
+    let bType;
+    if (type.includes('Сохранить')){
+        bType = 'Да';
+    }
+    else {
+        bType = 'Нет';
+    }
+    let message = `<b>Оценка торговой идеи:</b> ${first_criterion}\n<b>Оценка точки входа:</b> ${second_criterion}\n<b>Альтернативная точка входа:</b> ${entry_price}\n<b>Соответствие портфель:</b> ${bType}\n<b>Возьмешь себе:</b> ${portfolio}\n<b>Коментарий:</b> ${comment}`;
     return message;
 }
 
@@ -59,29 +66,25 @@ function generateList(first_array, second_array) {
         return first_array;
     }
     else {
-        let newList = first_array.filter( o => second_array.find( x => o.id_telegram !== x.user_id ));
-        return newList;
+        let newArray = first_array.filter(({ id_telegram}) =>
+            !second_array.some(exclude => exclude.user_id === id_telegram))
+        return newArray;
     }
 }
 
 
 function generateFinishMessage(firstArray, secondArray) {
-    return `${firstArray}/${secondArray} аналитиков оценили\n`
+    return `Оценили <b>${firstArray}/${secondArray}</b>`
 }
 
 
-function generateTitle(){
-    return '1. Драйверы к росту фундаментала.\n2. Точка входа по тех анализу.\n3. Корректность типа стратегии. \n4. Общая оценка.\n'
+function generateString(grade, averageCriterion){
+    return `${grade} <b>${averageCriterion}</b>`
 }
 
 
-function generateString(username, firstCriterion, secondCriterion, thirdCriterion, summary){
-    return `@${username} | ${firstCriterion} | ${secondCriterion} | ${thirdCriterion} | ${summary}`
-}
-
-
-function finishString(username, firstCriterion, secondCriterion, thirdCriterion, summary){
-    return `\n${username} ${firstCriterion} | ${secondCriterion} | ${thirdCriterion} | ${summary} `
+function generateStringSummary(grade, averageCriterion, summary){
+    return `${grade} <b>${averageCriterion}/${summary}</b>`
 }
 
 
@@ -89,23 +92,36 @@ function generateComment(username, comment){
     return `\n@${username}: \n${comment} `
 }
 
+function generatePrice(price){
+    return `<b>Цена входа:</b> ${price}`
+}
+
 
 function publishIdea(idea, title, username){
     let getFormat = returnFormat(idea.tp, idea.sl);
-    return `<b>${title}</b>\n@${username} \n<b>Тикер:</b> ${idea.ticker}\n<b>Стратегия:</b> ${idea.type}\n#${idea.order_type} ${idea.percent}%\n<b>Цена входа:</b> ${idea.entry_price}$\n<b>TP:</b> ${getFormat.TP}   <b>SL:</b> ${getFormat.SL}\n<b>Срок:</b>  ${idea.timemodifier}\n<b>Источник:</b>  ${idea.source}\n<b>Риск:</b>  ${idea.risk}/5\n<b>Комментарий:</b> ${idea.comment}`;
+    return `<b>${title}</b>\n<b>№${PrefInt((idea.id).toString(), 4)}</b> @${username}\n💼 <a href="${idea.url}">${idea.ticker}</a>\n<b>🟢 Вход:</b> ${idea.entry_price}$\n<b>🟠 Цель:</b> ${getFormat.TP}\n<b>🔴 Стоп:</b> ${getFormat.SL}\n<b>Стратегия:</b> ${idea.type}\n<b>Тип:</b> ${idea.order_type}\n<b>Источник:</b> ${idea.source}\n<b>Комментарий:</b> ${idea.comment}\n`;
+}
+
+
+function publishIdeaAdmin(idea, title, username, admin, commentAdmin, priceAdmin){
+    let getFormat = returnFormat(idea.tp, idea.sl);
+    return `<b>${title}</b>\n<b>№${PrefInt((idea.id).toString(), 4)}</b> @${username}\n💼 <a href="${idea.url}">${idea.ticker}</a>\n<b>🟢 Вход:</b> ${idea.entry_price}$\n<b>🟠 Цель:</b> ${getFormat.TP}\n<b>🔴 Стоп:</b> ${getFormat.SL}\n<b>Стратегия:</b> ${idea.type}\n<b>Тип:</b> ${idea.order_type}\n<b>Источник:</b> ${idea.source}\n<b>Комментарий:</b> ${idea.comment}\n<b>Цена входа администратора:</b> ${priceAdmin}\n<b>Администратор @${admin}:</b> ${commentAdmin} `;
 }
 
 
 function searchIdea(username, idea){
     let getFormat = returnFormat(idea.tp, idea.sl);
-    return `<b>UUID:</b> ${idea.id}\n@${username} \n<b>Тикер:</b> ${idea.ticker}\n<b>Стратегия:</b> ${idea.type}\n#${idea.order_type} ${idea.percent}%\n<b>Цена входа:</b> ${idea.entry_price}$\n<b>TP:</b> ${getFormat.TP}   <b>SL:</b> ${getFormat.SL}\n<b>Срок:</b>  ${idea.timemodifier}\n<b>Источник:</b>  ${idea.source}\n<b>Риск:</b>  ${idea.risk}/5\n<b>Комментарий:</b> ${idea.comment}\n<b>Статус:</b> ${idea.status}`;
+    return `<b>№${PrefInt((idea.id).toString(), 4)}</b> @${username}\n💼 <a href="${idea.url}">${idea.ticker}</a>\n<b>🟢 Вход:</b> ${idea.entry_price}$\n<b>🟠 Цель:</b> ${getFormat.TP}\n<b>🔴 Стоп:</b> ${getFormat.SL}\n<b>Стратегия:</b> ${idea.type}\n<b>Тип:</b> ${idea.order_type}\n<b>Источник:</b> ${idea.source}\n<b>Комментарий:</b> ${idea.comment}\n<b>Статус:</b> ${idea.status}`;
 }
 
 function showUser(user){
     return `<b>Пользователь:</b> @${user.nickname}\n<b>Права:</b> ${user.permissions}`
 }
 
+function commentAdmin(place, uuid, idea, username, comment, price) {
+    return `<b>Размещена в ${place} ID:</b> ${uuid}\n<b>Тикер:</b> ${idea[0].ticker}\n<b>Комментарий: ${comment}</b>\n<b>Цена входа: ${price}</b>\n<b>Решение принял:</b> @${username}`
+}
 
 
-module.exports = { generate_message, managerMessage, getTime, generateList, generateFinishMessage, generateTitle,
-    generateString, finishString, generate_message_alert, generateComment, publishIdea, searchIdea, showUser}
+module.exports = { generate_message, managerMessage, getTime, generateList, generateFinishMessage, generateStringSummary, PrefInt,
+    generateString, generateComment, publishIdea, searchIdea, showUser, publishIdeaAdmin, commentAdmin, generatePrice}

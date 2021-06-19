@@ -7,8 +7,8 @@ class strategyController {
         let response;
         try {
         response = await db.query('INSERT INTO strategy' +
-            '(type, source, ticker, order_type, entry_price, percent, TP, SL, timemodifier, risk, id_telegram, comment, ts) ' +
-            `VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, to_timestamp(${Date.now()} / 1000.0)) RETURNING *`, call_json);
+            '(type, url, source, ticker, order_type, entry_price, TP, SL, id_telegram, comment, ts) ' +
+            `VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, to_timestamp(${Date.now()} / 1000.0)) RETURNING *`, call_json);
         return response.rows;
     } catch (error) {
             return error;
@@ -18,8 +18,8 @@ class strategyController {
     async getStrategyByTicker(ticker) {
         let response;
         try {
-            response = await db.query('SELECT id, type, source, ticker, order_type, entry_price, percent, ' +
-                'TP, SL, id_telegram, risk, timemodifier, comment, status FROM strategy WHERE ticker = $1 ', [ticker]);
+            response = await db.query('SELECT id, type, source, url, ticker, order_type, entry_price, ' +
+                'TP, SL, id_telegram, comment, status FROM strategy WHERE ticker = $1 ', [ticker]);
             return response.rows;
         } catch (error) {
             return error;
@@ -29,8 +29,8 @@ class strategyController {
     async getStrategyByUUID(strategy_id) {
         let response;
         try {
-            response = await db.query('SELECT type, source, ticker, order_type, entry_price, percent, ' +
-                'TP, SL, timemodifier, risk, id_telegram, comment, status, approved FROM strategy WHERE id = $1', [strategy_id]);
+            response = await db.query('SELECT id, type, url, source, ticker, order_type, entry_price,' +
+                'TP, SL, id_telegram, comment, status, approved FROM strategy WHERE id = $1', [strategy_id]);
             return response.rows;
         } catch (error) {
             return error;
@@ -81,7 +81,7 @@ class strategyController {
         let response;
         try {
             response = await db.query('SELECT type, source, ticker, tp, sl, order_type, ' +
-                'entry_price, id_telegram, id, risk, comment, percent, timemodifier  FROM strategy WHERE watchlist = $1', [true]);
+                'entry_price, id_telegram, id, comment FROM strategy WHERE watchlist = $1', [true]);
             return response.rows;
         }
         catch (error) {
@@ -93,14 +93,44 @@ class strategyController {
         let response;
         try {
             response = await db.query('INSERT INTO strategy' +
-                '(type, source, ticker, order_type, entry_price, percent, TP, SL, timemodifier, risk, id_telegram, comment, ts, status, approved, watchlist) ' +
-                `VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, to_timestamp(${Date.now()} / 1000.0), $13, $14, true) RETURNING *`, call_json);
+                '(type, source, ticker, order_type, entry_price, TP, SL, id_telegram, comment, ts, status, approved, watchlist) ' +
+                `VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, to_timestamp(${Date.now()} / 1000.0), $13, $14, true) RETURNING *`, call_json);
             return response.rows;
         } catch (error) {
             return error;
         }
     }
 
+
+    async updatePriceStrategy(strategy_id, entry_price){
+        let response;
+        try {
+            response = await db.query('UPDATE strategy SET entry_price = $1 WHERE id = $2 RETURNING *', [entry_price, strategy_id]);
+            return response.rows;
+        }catch (error) {
+            return error;
+        }
+    }
+
+    async updatePriceComment(strategy_id, comment){
+        let response;
+        try {
+            response = await db.query('UPDATE strategy SET comment = $1 WHERE id = $2 RETURNING *', [comment, strategy_id]);
+            return response.rows;
+        }catch (error) {
+            return error;
+        }
+    }
+
+    async getLastRecord(){
+        let response;
+        try {
+            response = await db.query('SELECT id FROM strategy ORDER BY ts desc LIMIT 1')
+            return response.rows;
+        }catch (error){
+            return error;
+        }
+    }
 }
 
 

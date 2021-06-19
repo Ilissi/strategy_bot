@@ -11,12 +11,13 @@ const gradeDataWizard = require('./scenes/addGrade').gradeDataWizard
 const searchIdea = require('./scenes/searchIdea').searchIdeaWizard
 const editPermission = require('./scenes/editPermissions').editPermissionsWizard
 const publishWatchList = require('./scenes/approveWatchList').publishWatchListWizard
+const adminAccept = require('./scenes/adminAccept').adminAcceptWizard
 const generateMessage = require('./utils/generate_message')
 const Keyboards = require('./keyboards/keyboards')
 
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
-const stage = new Stage([contactDataWizard, gradeDataWizard, searchIdea, editPermission, publishWatchList]);
+const stage = new Stage([contactDataWizard, gradeDataWizard, searchIdea, editPermission, publishWatchList, adminAccept]);
 bot.use(session());
 bot.use(stage.middleware());
 
