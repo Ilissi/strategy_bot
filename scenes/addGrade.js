@@ -40,6 +40,7 @@ const gradeDataWizard = new WizardScene(
         if (idea[0].approved != true){
             console.log('+')
             let checkResponse = await gradeController.checkAccepted(ctx.wizard.state.contactData.UUID, ctx.wizard.state.contactData.userid);
+            console.log(checkResponse)
             if (checkResponse.length == 0){
                 ctx.reply('Оцени Торговую идею:\nПортфель/Тикер/Торговый тезис', Keyboards.insertGrade());
                 return ctx.wizard.next();
