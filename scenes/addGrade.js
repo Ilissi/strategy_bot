@@ -44,6 +44,7 @@ const gradeDataWizard = new WizardScene(
             if (checkResponse.length == 0){
                 console.log('+')
                 await ctx.reply('Оцени Торговую идею:\nПортфель/Тикер/Торговый тезис', Keyboards.insertGrade());
+                console.log('+')
                 return ctx.wizard.next();
             }
             else {
