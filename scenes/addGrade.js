@@ -10,6 +10,7 @@ const generateMessage = require('../utils/generate_message')
 
 
 async function checkMessageGrade(ctx){
+    console.log('+')
     if (generateMessage.checkMessage(ctx, ctx.message) == true){
         ctx.deleteMessage()
         ctx.reply('Отмена')
@@ -37,6 +38,7 @@ const gradeDataWizard = new WizardScene(
         ctx.wizard.state.contactData.UUID = list_data[1];
         let idea = await strategyController.getStrategyByUUID(ctx.wizard.state.contactData.UUID);
         if (idea[0].approved != true){
+            console.log('+')
             let checkResponse = await gradeController.checkAccepted(ctx.wizard.state.contactData.UUID, ctx.wizard.state.contactData.userid);
             if (checkResponse.length == 0){
                 ctx.reply('Оцени Торговую идею:\nПортфель/Тикер/Торговый тезис', Keyboards.insertGrade());
