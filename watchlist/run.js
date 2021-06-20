@@ -67,7 +67,6 @@ async function compareValues(yahooValue, ideaObject){
 
 async function getValuesOfWatchList(){
     let watchlist = await strategyController.selectWatchList();
-    console.log(watchlist)
     let response = await generateArray(watchlist);
     for (let i = 0; i < watchlist.length; i++){
         await compareValues(response, watchlist[i]);
