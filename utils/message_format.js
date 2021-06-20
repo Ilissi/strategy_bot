@@ -62,6 +62,8 @@ function getTime(){
 
 
 function generateList(first_array, second_array) {
+    console.log(first_array)
+    console.log(second_array)
     if (typeof second_array == 'undefined'){
         return first_array;
     }
