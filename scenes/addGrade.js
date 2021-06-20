@@ -45,7 +45,7 @@ const gradeDataWizard = new WizardScene(
             console.log(checkResponse)
             if (checkResponse.length == 0){
                 console.log('+')
-                await ctx.reply('Оцени Торговую идею:\nПортфель/Тикер/Торговый тезис', Keyboards.insertGrade());
+                await ctx.reply('Оцени Торговую идею:\nПортфель/Тикер/Торговый тезис');
                 console.log('+')
                 return ctx.wizard.next();
             }
