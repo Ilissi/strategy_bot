@@ -17,11 +17,13 @@ async function checkMessageGrade(ctx){
         return true;
     }
     else if (typeof ctx.message == 'object'){
+        console.log('+')
         ctx.deleteMessage()
         await ctx.replyWithHTML('Вы сломали меня! Нажимать нужно на кнопку\nНажми <b>Оценить</b> идею еще раз!')
         return true;
     }
     else if(ctx.callbackQuery.data.startsWith('grade')){
+        console.log('+')
         ctx.deleteMessage()
         await ctx.reply('Что-то пошло не так! Попробуй оценить еще раз!')
         return true;
