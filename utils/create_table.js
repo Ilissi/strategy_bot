@@ -44,6 +44,13 @@ async function createDatabase(){
             "strategy_id INTEGER REFERENCES strategy(id) ON DELETE CASCADE);",
             (err, res) => {
                 console.log(err, res);
+            });
+        pool.query("CREATE TABLE IF NOT EXISTS user_activity (" +
+            "id SERIAL PRIMARY KEY, " +
+            "user_id INTEGER REFERENCES users(id_telegram) ON DELETE CASCADE," +
+            "activity TIMESTAMP NOT NULL); ",
+            (err, res) => {
+                console.log(err, res);
                 pool.end();
             });
     })

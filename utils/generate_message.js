@@ -2,8 +2,10 @@ const Telegraf = require('telegraf')
 const userController = require('../contoller/user.Controller')
 const gradeController = require('../contoller/grade.Controller')
 const strategyController = require('../contoller/strategy.Controller')
+const activityController = require('../contoller/activity.Controller')
 const Keyboards = require('../keyboards/keyboards')
 const messageFormat = require('../utils/message_format')
+const parse = require('postgres-date')
 
 
 
@@ -74,21 +76,25 @@ const sendIdea = async (ctx, message, idea_uuid, ticker) => {
             await bot.telegram.sendMessage(users[i].id_telegram, message, Keyboards.acceptGrade(idea_uuid, ticker) );
         }
     }
-    await setTimeout(notificationAlert, 5 * 60000, ctx, idea_uuid)
-    await setTimeout(notificationFinish, 20 * 60000, ctx, idea_uuid)
+    await setTimeout(notificationAlert, 0.5 * 60000, ctx, idea_uuid)
+    await setTimeout(notificationFinish, 2 * 60000, ctx, idea_uuid)
 }
 
 
 const notificationAlert = async (ctx, idea_uuid) => {
     const getStrategyApprove = await strategyController.checkApprove(idea_uuid);
+    const getTime = await activityController.getActivityRecord()
     if (getStrategyApprove.length == 0) {
-        const users = await userController.getAllUsers();
-        const approveUsers = await gradeController.returnApproved(idea_uuid)
-        let alertUsers = messageFormat.generateList(users, approveUsers)
         let message = 'Осталось 15 минут для оценки идеи'
-        for (let i = 0; i < alertUsers.length; i++) {
-            if (alertUsers[i].id_telegram != ctx.chat.id) {
-                await bot.telegram.sendMessage(alertUsers[i].id_telegram, message)
+        for (let i = 0; i < getTime.length; i++) {
+            let click = parse(getTime[i].user_activity)
+            let dateNow = Date.now()
+            let beetwen = dateNow - click;
+            let timeInMS = 300000;
+            if (beetwen >= timeInMS) {
+                if (getTime[i].user_id != ctx.chat.id) {
+                    await bot.telegram.sendMessage(getTime[i].user_id, message)
+                }
             }
         }
     }

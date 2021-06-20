@@ -6,6 +6,7 @@ const fs = require( "fs" );
 require('dotenv').config()
 
 const userController = require('./contoller/user.Controller')
+const activityController = require('./contoller/activity.Controller')
 const contactDataWizard = require('./scenes/addStrategy').contactDataWizard
 const gradeDataWizard = require('./scenes/addGrade').gradeDataWizard
 const searchIdea = require('./scenes/searchIdea').searchIdeaWizard
@@ -29,53 +30,63 @@ bot.start(async (ctx) => {
     let check_block = await userController.checkStatus(ctx.message.chat.id, 'Отклонить');
     let userFirstName = ctx.message.from.first_name
     if (check_user.length == 0){
-        await generateMessage.registerUser(ctx)
+        await generateMessage.registerUser(ctx);
+        await activityController.createActivityRecord(ctx.chat.id);
+
         await ctx.reply(`Привет, ${userFirstName}, дождись подтверждения регистрации у администратора! `);
     }
     else if(check_block.length == 1){
+        await activityController.updateActivityRecord(ctx.chat.id);
         await ctx.reply(`Привет, ${userFirstName}. Администратор октлонил Вашу регистрацию. `);
     }
     else if (check_status.length > 0){
+        await activityController.updateActivityRecord(ctx.chat.id);
         await ctx.reply(`Привет, ${userFirstName}, администратор еще не подтвердил твою регистрацию! `);
     }
     else {
+        await activityController.updateActivityRecord(ctx.chat.id);
         await ctx.reply(`С возвращением, ${userFirstName}!`);
     }
 });
 
 
 bot.command('add', async (ctx) => {
-    if (await userController.checkPermission(ctx.message.chat.id, 'Администратор')){
+    await activityController.updateActivityRecord(ctx.chat.id);
+    if (await userController.checkPermission(ctx.chat.id, 'Администратор')){
         ctx.scene.enter('add_strategy');
     }
-    else if (await userController.checkPermission(ctx.message.chat.id, 'Аналитик')){
+    else if (await userController.checkPermission(ctx.chat.id, 'Аналитик')){
         ctx.scene.enter('add_strategy');
     }
     else ctx.reply('У вас нет прав для этого!');
 });
 
 bot.command('search', async (ctx) => {
-    if (await userController.checkPermission(ctx.message.chat.id, 'Администратор')){
+    await activityController.updateActivityRecord(ctx.chat.id);
+    if (await userController.checkPermission(ctx.chat.id, 'Администратор')){
         ctx.scene.enter('search_idea');
     }
     else ctx.reply('У вас нет прав для этого!');
 });
 
 bot.command('edit', async (ctx) => {
-    if (await userController.checkPermission(ctx.message.chat.id, 'Администратор')){
+    await activityController.updateActivityRecord(ctx.chat.id);
+    if (await userController.checkPermission(ctx.chat.id, 'Администратор')){
         ctx.scene.enter('edit_permissions');
     }
     else await ctx.reply('У вас нет прав для этого!');
 });
 
 bot.command('users', async (ctx) => {
-    if (await userController.checkPermission(ctx.message.chat.id, 'Администратор')){
+    await activityController.updateActivityRecord(ctx.chat.id);
+    if (await userController.checkPermission(ctx.chat.id, 'Администратор')){
         await generateMessage.returnUsers(ctx)
     }
     else ctx.reply('У вас нет прав для этого!');
 });
 
 bot.action(/change (.+)/, async (ctx) =>{
+    await activityController.updateActivityRecord(ctx.chat.id);
     await ctx.deleteMessage();
     let action = 'editStatus';
     let user_id = ctx.callbackQuery.data.split(' ')[1];
@@ -83,6 +94,7 @@ bot.action(/change (.+)/, async (ctx) =>{
 });
 
 bot.action(/updateStatus (.+)/, async (ctx) => {
+    await activityController.updateActivityRecord(ctx.chat.id);
     let response = ctx.callbackQuery.data.split(' ');
     let user_id = response[1];
     let user = await userController.lookUpUser(user_id);
@@ -95,41 +107,49 @@ bot.action(/updateStatus (.+)/, async (ctx) => {
 });
 
 bot.action(/editStatus (.+)/, async (ctx) =>{
+    await activityController.updateActivityRecord(ctx.chat.id);
     let message = ctx.callbackQuery.data;
     let admin_id = ctx.callbackQuery.message.chat.id;
     await generateMessage.updateUser(ctx, message, admin_id);
 })
 
 
-bot.action(/grade (.+)/, ctx => {
+bot.action(/grade (.+)/, async (ctx) => {
+    await activityController.updateActivityRecord(ctx.chat.id);
     ctx.scene.enter('add_grade');
 });
 
 bot.action(/channel (.+)/, async (ctx) =>{
+    await activityController.updateActivityRecord(ctx.chat.id);
     await generateMessage.approveAdminIdea(ctx, ctx.callbackQuery.data);
 });
 
 bot.action(/watchlist (.+)/, async (ctx) =>{
+    await activityController.updateActivityRecord(ctx.chat.id);
     await generateMessage.approveAdminIdea(ctx, ctx.callbackQuery.data);
 });
 
 bot.action(/cancels (.+)/, async (ctx) =>{
+    await activityController.updateActivityRecord(ctx.chat.id);
     await generateMessage.approveAdminIdea(ctx, ctx.callbackQuery.data);
 });
 
 bot.action(/tp (.+)/, async (ctx) =>{
+    await activityController.updateActivityRecord(ctx.chat.id);
     ctx.scene.enter('generate_watchlist');
 });
 
 bot.action(/sl (.+)/, async (ctx) =>{
+    await activityController.updateActivityRecord(ctx.chat.id);
     ctx.scene.enter('generate_watchlist');
 });
 
 bot.action(/average (.+)/, async (ctx) =>{
+    await activityController.updateActivityRecord(ctx.chat.id);
     ctx.scene.enter('generate_watchlist');
 });
 
-
+/*
 let tlsOptions = {
     key: fs.readFileSync("/etc/letsencrypt/live/analytics-research-bot.ru/privkey.pem"),
     cert: fs.readFileSync("/etc/letsencrypt/live/analytics-research-bot.ru/fullchain.pem")
@@ -139,3 +159,6 @@ let tlsOptions = {
 
 bot.telegram.setWebhook('https://analytics-research-bot.ru/about');
 bot.startWebhook('/about', tlsOptions, 3000);
+*/
+
+bot.launch()

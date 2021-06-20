@@ -17,10 +17,12 @@ class Keyboards {
         ]).extra();
     }
 
-    confirmStrategy() {
-        return Markup.inlineKeyboard(
-            [Markup.callbackButton('Cтратегия личная', 'Личная')]).extra()
+    acceptPoint() {
+        return Markup.inlineKeyboard([
+            Markup.callbackButton('ДА', 'ДА'),
+            Markup.callbackButton('НЕТ', '-')]).extra();
     }
+
 
     getOrder() {
         return Markup.inlineKeyboard([

@@ -5,6 +5,8 @@ const strategyController = require('../contoller/strategy.Controller')
 const userController = require('../contoller/user.Controller')
 const messageFormat = require('../utils/message_format')
 const Keyboards = require('../keyboards/keyboards')
+const activityController = require('../contoller/activity.Controller')
+const filters = require('../utils/filters')
 
 require('dotenv').config()
 const bot = new Telegraf(process.env.BOT_TOKEN)
@@ -49,9 +51,15 @@ const publishWatchListWizard = new WizardScene(
         }
     },
     async (ctx) => {
-        if (typeof ctx.message.text == 'undefined'){
-            ctx.reply('Попробуйте еще раз!')
-            ctx.wizard.leave();
+        await activityController.updateActivityRecord(ctx.chat.id);
+        if (filters.checkCommand(ctx)){
+            return ctx.scene.leave();
+        }
+        else if (filters.checkAction(ctx)){
+            return ctx.scene.leave();
+        }
+        else if (filters.checkCallback(ctx)){
+            return ctx.scene.leave();
         }
         else {
             let comment = ctx.message.text;
@@ -92,9 +100,16 @@ const publishWatchListWizard = new WizardScene(
         return ctx.wizard.next();
     },
     async (ctx) =>{
+        await activityController.updateActivityRecord(ctx.chat.id);
         ctx.deleteMessage()
-        if (typeof ctx.message == 'object'){
-            ctx.reply('Вы сломали меня! Нажимать нужно на кнопку\nПопробуй еще раз!')
+        if (filters.checkCommand(ctx)){
+            return ctx.scene.leave();
+        }
+        else if (filters.checkAction(ctx)){
+            return ctx.scene.leave();
+        }
+        else if (filters.checkText(ctx)){
+            return ctx.scene.leave();
         }
         else if(ctx.callbackQuery.data == 'Отправить'){
             let response =  ctx.wizard.state.contactData.response.split(' ');
