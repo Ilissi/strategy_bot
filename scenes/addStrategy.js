@@ -161,9 +161,15 @@ const contactDataWizard = new WizardScene(
                 return ctx.scene.leave();
             }
             else {
-                ctx.wizard.state.contactData.price_enter = ctx.message.text;
-                ctx.reply('🟠Цель');
-                return ctx.wizard.next();
+                if (generateMessage.checkDigitDiapason(ctx.message.text)) {
+                    ctx.wizard.state.contactData.price_enter = ctx.message.text;
+                    ctx.reply('🟠Цель');
+                    return ctx.wizard.next();
+                }
+                else {
+                    ctx.reply('Ошибка формата ввода.');
+                    return ctx.scene.leave();
+                }
             }
         }
     },
@@ -180,13 +186,26 @@ const contactDataWizard = new WizardScene(
         }
         else if (typeof ctx.wizard.state.contactData.price_enter == 'undefined'){
             ctx.wizard.state.contactData.price_enter = ctx.message.text;
-            ctx.reply('🟠Цель');
-            return ctx.wizard.next();
+            if (generateMessage.checkDigitDiapason(ctx.message.text)) {
+                ctx.wizard.state.contactData.price_enter = ctx.message.text;
+                ctx.reply('🟠Цель');
+                return ctx.wizard.next();
+            }
+            else {
+                ctx.reply('Ошибка формата ввода.');
+                return ctx.scene.leave();
+            }
         }
         else {
-            ctx.wizard.state.contactData.TP = ctx.message.text;
-            ctx.reply('🔴Стоп');
-            return ctx.wizard.next();
+            if (generateMessage.checkDigit(ctx.message.text)) {
+                ctx.wizard.state.contactData.TP = ctx.message.text;
+                ctx.reply('🔴Стоп');
+                return ctx.wizard.next();
+            }
+            else {
+                ctx.reply('Ошибка формата ввода.');
+                return ctx.scene.leave();
+            }
         }
     },
     async (ctx) => {
@@ -201,9 +220,15 @@ const contactDataWizard = new WizardScene(
             return ctx.scene.leave();
         }
         else if (typeof ctx.wizard.state.contactData.TP == 'undefined'){
-            ctx.wizard.state.contactData.TP = ctx.message.text;
-            ctx.reply('🔴Стоп');
-            return ctx.wizard.next();
+            if (generateMessage.checkDigit(ctx.message.text)) {
+                ctx.wizard.state.contactData.TP = ctx.message.text;
+                ctx.reply('🔴Стоп');
+                return ctx.wizard.next();
+            }
+            else {
+                ctx.reply('Ошибка формата ввода.');
+                return ctx.scene.leave();
+            }
         }
         else {
             if (typeof ctx.wizard.state.contactData.SL == 'undefined'){

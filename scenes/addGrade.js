@@ -150,9 +150,15 @@ const gradeDataWizard = new WizardScene(
                 return ctx.scene.leave();
             }
             else {
-                ctx.wizard.state.contactData.price_enter = ctx.message.text;
-                ctx.reply('Возьмешь себе в портфель?', Keyboards.portfolio());
-                return ctx.wizard.next();
+                if (generateMessage.checkDigitDiapason(ctx.message.text)) {
+                    ctx.wizard.state.contactData.price_enter = ctx.message.text;
+                    ctx.reply('Возьмешь себе в портфель?', Keyboards.portfolio());
+                    return ctx.wizard.next();
+                }
+                else {
+                    ctx.reply('Ошибка формата ввода.');
+                    return ctx.scene.leave();
+                }
             }
         }
         else {
