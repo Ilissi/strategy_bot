@@ -23,11 +23,12 @@ async function createDatabase(){
             "TP VARCHAR(255) NOT NULL, " +
             "SL VARCHAR(255) NOT NULL,  " +
             "id_telegram INTEGER NOT NULL," +
-            "comment VARCHAR(255) NOT NULL, " +
+            "comment VARCHAR(2048) NOT NULL, " +
             "ts TIMESTAMP NOT NULL, " +
             "status VARCHAR(255), " +
             "approved BOOLEAN," +
-            "watchlist BOOLEAN);",
+            "watchlist BOOLEAN," +
+            "comment_admin VARCHAR(2048));",
             (err, res) => {
                 console.log(err, res);
             });
@@ -37,7 +38,7 @@ async function createDatabase(){
             "first_criterion INTEGER NOT NULL, " +
             "second_criterion INTEGER NOT NULL, " +
             "price_entity VARCHAR(255) NOT NULL, " +
-            "comment VARCHAR(255) NOT NULL," +
+            "comment VARCHAR(2048) NOT NULL," +
             "order_type VARCHAR(255) NOT NULL," +
             "portfolio VARCHAR(255) NOT NULL," +
             "user_id INTEGER REFERENCES users(id_telegram) ON DELETE CASCADE," +

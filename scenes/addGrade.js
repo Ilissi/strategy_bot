@@ -16,7 +16,7 @@ async function checkGrade(ctx){
         let response = await gradeController.createGrade(ctx.wizard.state.contactData)
         let boolPosted = await gradeController.checkResponse(ctx.wizard.state.contactData.UUID)
         await ctx.reply('Оценка отправлена.')
-        if (typeof response == 'undefined'){
+        if (response.severity == 'ERROR'){
             ctx.reply('Ошибка формата текста! Сообщение не отправлено!')
         }
         else if (boolPosted == true){
@@ -33,27 +33,30 @@ async function checkGrade(ctx){
 const gradeDataWizard = new WizardScene(
     'add_grade', // first argument is Scene_ID, same as for BaseScene
     async (ctx) => {
-        await activityController.updateActivityRecord(ctx.chat.id);
-        ctx.wizard.state.contactData = {};
-        ctx.wizard.state.contactData.username = ctx.callbackQuery.from.username;
-        ctx.wizard.state.contactData.userid = ctx.callbackQuery.from.id;
-        let list_data = ctx.callbackQuery.data.split(' ');
-        ctx.wizard.state.contactData.UUID = list_data[1];
-        let idea = await strategyController.getStrategyByUUID(ctx.wizard.state.contactData.UUID);
-        if (idea[0].approved != true){
-            let checkResponse = await gradeController.checkAccepted(ctx.wizard.state.contactData.UUID, ctx.wizard.state.contactData.userid);
-            if (checkResponse.length == 0){
-                ctx.reply('Оцени Торговую идею:\nПортфель/Тикер/Торговый тезис', Keyboards.insertGrade());
-                return ctx.wizard.next();
-            }
-            else {
-                ctx.reply('Вы уже оценили эту идею!');
-                return ctx.scene.leave();
-            }
+        if (filters.checkText(ctx)){
+            return ctx.scene.leave();
         }
         else {
-            ctx.reply('Решение по этой идеи принято.')
-            return ctx.scene.leave();
+            await activityController.updateActivityRecord(ctx.chat.id);
+            ctx.wizard.state.contactData = {};
+            ctx.wizard.state.contactData.username = ctx.callbackQuery.from.username;
+            ctx.wizard.state.contactData.userid = ctx.callbackQuery.from.id;
+            let list_data = ctx.callbackQuery.data.split(' ');
+            ctx.wizard.state.contactData.UUID = list_data[1];
+            let idea = await strategyController.getStrategyByUUID(ctx.wizard.state.contactData.UUID);
+            if (idea[0].approved != true) {
+                let checkResponse = await gradeController.checkAccepted(ctx.wizard.state.contactData.UUID, ctx.wizard.state.contactData.userid);
+                if (checkResponse.length == 0) {
+                    ctx.reply('Оцени Торговую идею:\nПортфель/Тикер/Торговый тезис', Keyboards.insertGrade());
+                    return ctx.wizard.next();
+                } else {
+                    ctx.reply('Вы уже оценили эту идею!');
+                    return ctx.scene.leave();
+                }
+            } else {
+                ctx.reply('Решение по этой идеи принято.')
+                return ctx.scene.leave();
+            }
         }
     },
     async (ctx) => {

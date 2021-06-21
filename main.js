@@ -149,7 +149,7 @@ bot.action(/average (.+)/, async (ctx) =>{
     ctx.scene.enter('generate_watchlist');
 });
 
-/*
+
 let tlsOptions = {
     key: fs.readFileSync("/etc/letsencrypt/live/analytics-research-bot.ru/privkey.pem"),
     cert: fs.readFileSync("/etc/letsencrypt/live/analytics-research-bot.ru/fullchain.pem")
@@ -158,7 +158,6 @@ let tlsOptions = {
 
 
 bot.telegram.setWebhook('https://analytics-research-bot.ru/about');
-bot.startWebhook('/about', tlsOptions, 3000);
-*/
+bot.startWebhook('/about', null, 3000);
 
-bot.launch()
+

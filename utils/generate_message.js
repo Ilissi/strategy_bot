@@ -130,20 +130,26 @@ const returnGrades = async (ctx, idea_uuid) => {
         format_message.push(messageFormat.generateFinishMessage(grades.length, users.length - 1));
         let firstCriterion = 0;
         let secondCriterion = 0;
+        let arrayEntryPoint = []
         for (let i = 0; i < grades.length; i++) {
             firstCriterion += grades[i].first_criterion;
             secondCriterion += grades[i].second_criterion;
+            if (grades[i].price_entity != '-') {
+                arrayEntryPoint.push(grades[i].price_entity)
+            }
         }
         let order = await gradeController.CheckOrder(idea_uuid)
         let portfolio = await gradeController.CheckPortfolio(idea_uuid);
         format_message.push(messageFormat.generateString('Оценка торговой идеи:',(firstCriterion/grades.length).toFixed(1)));
         format_message.push(messageFormat.generateString('Оценка точки входа:',(secondCriterion/grades.length).toFixed(1)));
-        format_message.push(messageFormat.generateStringSummary('Соответствие портфель:', order.length, grades.length))
-        format_message.push(messageFormat.generateStringSummary('Сколько возьмут себе:', portfolio.length, grades.length))
+        format_message.push(messageFormat.generatePoint(arrayEntryPoint));
+        format_message.push(messageFormat.generateStringSummary('Соответствие портфель:', order.length, grades.length));
+        format_message.push(messageFormat.generateStringSummary('Сколько возьмут себе:', portfolio.length, grades.length));
         for (let i = 0; i < grades.length; i++) {
-            format_message.push(messageFormat.generateComment(grades[i].nickname, grades[i].comment))
-            format_message.push(messageFormat.generatePrice(grades[i].price_entity))
-
+            format_message.push(messageFormat.generateComment(grades[i].nickname, grades[i].comment));
+            format_message.push(messageFormat.generatePrice(grades[i].price_entity));
+            format_message.push(messageFormat.generateGrade('Оценка торговой идеи:', grades[i].first_criterion));
+            format_message.push(messageFormat.generateGrade('Оценка точки входа:', grades[i].second_criterion));
         }
         let finishMessage = format_message.join('\n')
         let author_message = 'Идея отправлена администраторам.'
@@ -152,7 +158,16 @@ const returnGrades = async (ctx, idea_uuid) => {
         for (let i = 0; i < admins.length; i++) {
             let acceptMessage = 'Примите решение по идее:'
             await bot.telegram.sendMessage(admins[i].id_telegram, idea_message, {parse_mode: 'HTML'});
-            await bot.telegram.sendMessage(admins[i].id_telegram, finishMessage, {parse_mode: 'HTML'});
+            if (finishMessage.length > 4096){
+                for (let i=0; i < finishMessage.length; i+=4096){
+                    let subMessage = finishMessage.substr(i, i+4096)
+                    await bot.telegram.sendMessage(admins[i].id_telegram, subMessage, {parse_mode: 'HTML'});
+                }
+            }
+            else {
+                await bot.telegram.sendMessage(admins[i].id_telegram, finishMessage, {parse_mode: 'HTML'});
+            }
+
             await bot.telegram.sendMessage(admins[i].id_telegram, acceptMessage, Keyboards.acceptIdeaChannel(idea_uuid));
         }
     }
@@ -202,17 +217,6 @@ const returnUsers = async (ctx) =>{
 }
 
 
-function checkMessage(ctx, message){
-    try {
-        if (message.text == '/cancel') {
-            return true;
-        }
-    }
-    catch (err) {
-    }
-}
-
-
 function checkDigitDiapason(message){
     let digit = /^[0-9]*.[0-9]*$/;
     let digitDiapazon = /^[0-9]*.[0-9]*-[0-9]*.[0-9]*$/
@@ -251,5 +255,5 @@ function returnId(idIdea){
     return record;
 }
 
-module.exports = { registerUser, updateUser, sendIdea, returnGrades, publishIdea, returnId,
-    checkMessage, approveAdminIdea, returnUsers, checkDigitDiapason, checkDigit }
+module.exports = { registerUser, updateUser, sendIdea, returnGrades, publishIdea,
+    returnId, approveAdminIdea, returnUsers, checkDigitDiapason, checkDigit }

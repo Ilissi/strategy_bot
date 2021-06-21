@@ -61,30 +61,43 @@ function getTime(){
 }
 
 
-function generateList(first_array, second_array) {
-    if (typeof second_array == 'undefined'){
-        return first_array;
-    }
-    else {
-        let newArray = first_array.filter(({ id_telegram}) =>
-            !second_array.some(exclude => exclude.user_id === id_telegram))
-        return newArray;
-    }
-}
-
-
 function generateFinishMessage(firstArray, secondArray) {
-    return `Оценили <b>${firstArray}/${secondArray}</b>`
+    return `<b>Оценили:</b> ${firstArray}/${secondArray}`
 }
 
 
 function generateString(grade, averageCriterion){
-    return `${grade} <b>${averageCriterion}</b>`
+    return `<b>${grade}</b> ${averageCriterion}`
 }
 
 
 function generateStringSummary(grade, averageCriterion, summary){
-    return `${grade} <b>${averageCriterion}/${summary}</b>`
+    return `<b>${grade}</b> ${averageCriterion}/${summary}`
+}
+
+
+function generatePoint(arrayEntry){
+    let pushStringFirst = 'Альтернативных точек входа нету';
+    let pushStringSecond = 'Альтернативная точка входа';
+    let pushStringThird= 'Альтернативные точки входа';
+    let message;
+    if (arrayEntry.length == 0){
+        message = `<b>${pushStringFirst}</b>`
+    }
+    else if (arrayEntry.length == 1){
+        message = `<b>${pushStringSecond}:</b> ${arrayEntry[0]}`
+    }
+    else {
+        let insertString = arrayEntry.join(' / ')
+        message = `<b>${pushStringThird}:</b> ${insertString}`
+    }
+    return message;
+
+}
+
+
+function generateGrade(gradeMark, grade){
+    return `<b>${gradeMark}</b> ${grade}`
 }
 
 
@@ -99,7 +112,7 @@ function generatePrice(price){
 
 function publishIdea(idea, title, username){
     let getFormat = returnFormat(idea.tp, idea.sl);
-    return `<b>${title}</b>\n<b>№${PrefInt((idea.id).toString(), 4)}</b> @${username}\n💼 <a href="${idea.url}">${idea.ticker}</a>\n<b>🟢 Вход:</b> ${idea.entry_price}$\n<b>🟠 Цель:</b> ${getFormat.TP}\n<b>🔴 Стоп:</b> ${getFormat.SL}\n<b>Стратегия:</b> ${idea.type}\n<b>Тип:</b> ${idea.order_type}\n<b>Источник:</b> ${idea.source}\n<b>Комментарий:</b> ${idea.comment}\n`;
+    return `<b>${title}</b>\n<b>№${PrefInt((idea.id).toString(), 4)}</b> @${username}\n💼 <a href="${idea.url}">${idea.ticker}</a>\n<b>🟢 Вход:</b> ${idea.entry_price}$\n<b>🟠 Цель:</b> ${getFormat.TP}\n<b>🔴 Стоп:</b> ${getFormat.SL}\n<b>Стратегия:</b> ${idea.type}\n<b>Тип:</b> ${idea.order_type}\n<b>Источник:</b> ${idea.source}\n<b>Торговая идея:</b> ${idea.comment}\n<b>Комментарий админа:</b>${idea.comment_admin}`;
 }
 
 
@@ -111,7 +124,10 @@ function publishIdeaAdmin(idea, title, username, admin, commentAdmin, priceAdmin
 
 function searchIdea(username, idea){
     let getFormat = returnFormat(idea.tp, idea.sl);
-    return `<b>№${PrefInt((idea.id).toString(), 4)}</b> @${username}\n💼 <a href="${idea.url}">${idea.ticker}</a>\n<b>🟢 Вход:</b> ${idea.entry_price}$\n<b>🟠 Цель:</b> ${getFormat.TP}\n<b>🔴 Стоп:</b> ${getFormat.SL}\n<b>Стратегия:</b> ${idea.type}\n<b>Тип:</b> ${idea.order_type}\n<b>Источник:</b> ${idea.source}\n<b>Комментарий:</b> ${idea.comment}\n<b>Статус:</b> ${idea.status}`;
+    if (idea.comment_admin!=null) {
+        return `<b>№${PrefInt((idea.id).toString(), 4)}</b> @${username}\n💼 <a href="${idea.url}">${idea.ticker}</a>\n<b>🟢 Вход:</b> ${idea.entry_price}$\n<b>🟠 Цель:</b> ${getFormat.TP}\n<b>🔴 Стоп:</b> ${getFormat.SL}\n<b>Стратегия:</b> ${idea.type}\n<b>Тип:</b> ${idea.order_type}\n<b>Источник:</b> ${idea.source}\n<b>Торговая идея:</b> ${idea.comment}\n<b>Комментарий админа:</b>${idea.comment_admin}\n<b>Статус:</b> ${idea.status}`;
+    }
+    else return `<b>№${PrefInt((idea.id).toString(), 4)}</b> @${username}\n💼 <a href="${idea.url}">${idea.ticker}</a>\n<b>🟢 Вход:</b> ${idea.entry_price}$\n<b>🟠 Цель:</b> ${getFormat.TP}\n<b>🔴 Стоп:</b> ${getFormat.SL}\n<b>Стратегия:</b> ${idea.type}\n<b>Тип:</b> ${idea.order_type}\n<b>Источник:</b> ${idea.source}\n<b>Торговая идея:</b> ${idea.comment}\n<b>Идея не подтверждена администратором</b>`;
 }
 
 function showUser(user){
@@ -119,9 +135,9 @@ function showUser(user){
 }
 
 function commentAdmin(place, uuid, idea, username, comment, price) {
-    return `<b>Размещена в ${place} ID:</b> ${uuid}\n<b>Тикер:</b> ${idea[0].ticker}\n<b>Комментарий: ${comment}</b>\n<b>Цена входа: ${price}</b>\n<b>Решение принял:</b> @${username}`
+    return `<b>Размещена в ${place}</b>\n<b>ID:</b> ${uuid}\n<b>Тикер:</b> ${idea[0].ticker}\n<b>Комментарий: ${comment}</b>\n<b>Цена входа: ${price}</b>\n<b>Решение принял:</b> @${username}`
 }
 
 
-module.exports = { generate_message, managerMessage, getTime, generateList, generateFinishMessage, generateStringSummary, PrefInt,
-    generateString, generateComment, publishIdea, searchIdea, showUser, publishIdeaAdmin, commentAdmin, generatePrice}
+module.exports = { generate_message, managerMessage, getTime, generateFinishMessage, generateStringSummary, PrefInt, generatePoint,
+    generateString, generateComment, publishIdea, searchIdea, showUser, publishIdeaAdmin, commentAdmin, generatePrice, generateGrade}

@@ -29,7 +29,8 @@ async function sendSL(ideaObject){
     let title = 'Закрытия сделки по SL';
     let username = await userController.lookUpUser(ideaObject.id_telegram);
     let message = messageFormat.publishIdea(ideaObject, title, username[0].nickname);
-    await strategyController.updateWatchListStrategy(ideaObject.id, 'Закрыта по SL');
+    await strategyController.updateWatchListStrategy(ideaObject.id, false);
+    await strategyController.updateStatusStrategy(ideaObject.id, 'Закрыта по SL');
     await sendAdmin(message, keyboards.stopLoss(ideaObject.id));
 }
 
@@ -37,7 +38,8 @@ async function averageIdea(ideaObject){
     let title = 'Усреднение';
     let username = await userController.lookUpUser(ideaObject.id_telegram);
     let message = messageFormat.publishIdea(ideaObject, title, username[0].nickname);
-    await strategyController.updateWatchListStrategy(ideaObject.id, 'Усреднена');
+    await strategyController.updateWatchListStrategy(ideaObject.id, false);
+    await strategyController.updateStatusStrategy(ideaObject.id, 'Усреднена');
     await sendAdmin(message, keyboards.averageIdea(ideaObject.id));
 }
 

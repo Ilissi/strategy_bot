@@ -19,7 +19,7 @@ class strategyController {
         let response;
         try {
             response = await db.query('SELECT id, type, source, url, ticker, order_type, entry_price, ' +
-                'TP, SL, id_telegram, comment, status FROM strategy WHERE ticker = $1 ', [ticker]);
+                'TP, SL, id_telegram, comment, status, comment_admin FROM strategy WHERE ticker = $1 ', [ticker]);
             return response.rows;
         } catch (error) {
             return error;
@@ -30,7 +30,7 @@ class strategyController {
         let response;
         try {
             response = await db.query('SELECT id, type, url, source, ticker, order_type, entry_price,' +
-                'TP, SL, id_telegram, comment, status, approved FROM strategy WHERE id = $1', [strategy_id]);
+                'TP, SL, id_telegram, comment, status, approved, comment_admin FROM strategy WHERE id = $1', [strategy_id]);
             return response.rows;
         } catch (error) {
             return error;
@@ -81,7 +81,7 @@ class strategyController {
         let response;
         try {
             response = await db.query('SELECT type, source, ticker, tp, sl, order_type, ' +
-                'entry_price, id_telegram, id, comment FROM strategy WHERE watchlist = $1', [true]);
+                'entry_price, id_telegram, id, comment, comment_admin FROM strategy WHERE watchlist = $1', [true]);
             return response.rows;
         }
         catch (error) {
@@ -112,10 +112,10 @@ class strategyController {
         }
     }
 
-    async updatePriceComment(strategy_id, comment){
+    async insertPriceComment(strategy_id, comment){
         let response;
         try {
-            response = await db.query('UPDATE strategy SET comment = $1 WHERE id = $2 RETURNING *', [comment, strategy_id]);
+            response = await db.query('UPDATE strategy SET comment_admin = $1 WHERE id = $2 RETURNING *', [comment, strategy_id]);
             return response.rows;
         }catch (error) {
             return error;

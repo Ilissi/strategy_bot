@@ -68,7 +68,7 @@ const publishWatchListWizard = new WizardScene(
             let ideaUUID = response[1];
             ctx.wizard.state.contactData.ideaObject = await strategyController.getStrategyByUUID(ideaUUID);
             ctx.wizard.state.contactData.username = await userController.lookUpUser(ctx.wizard.state.contactData.ideaObject[0].id_telegram);
-            ctx.wizard.state.contactData.ideaObject[0].comment = comment;
+            ctx.wizard.state.contactData.ideaObject[0].comment_admin = comment;
             if (response[0] == 'tp'){
                 ctx.wizard.state.contactData.title = 'Закрытие сделки по TP';
                 let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],

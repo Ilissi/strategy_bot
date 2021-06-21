@@ -36,7 +36,7 @@ const adminAcceptWizard = new WizardScene(
         }
         else {
             await ctx.reply('Ошибка ввода:');
-            return ctx.scene.leave();
+            return ctx.wizard.leave();
         }
     },
     async (ctx) => {
@@ -53,13 +53,23 @@ const adminAcceptWizard = new WizardScene(
         else {
             ctx.wizard.state.contactData.comment = ctx.message.text;
             let response = ctx.wizard.state.contactData.response.split(' ');
+            let source = response[0];
             let uuid = response[1];
+            let title;
             let idea = await strategyController.getStrategyByUUID(uuid);
             let user = await userController.lookUpUser(idea[0].id_telegram);
-            let title = 'Новая идея';
-            let message = messageFormat.publishIdeaAdmin(idea[0], title, user[0].nickname,
-                ctx.chat.username, ctx.wizard.state.contactData.comment, ctx.wizard.state.contactData.price);
-            ctx.replyWithHTML(message, Keyboards.acceptIdea())
+            if (response[0] == 'watchlist'){
+                let title = 'Новая идея в WatchList';
+                let message = messageFormat.publishIdeaAdmin(idea[0], title, user[0].nickname,
+                    ctx.chat.username, ctx.wizard.state.contactData.comment, ctx.wizard.state.contactData.price);
+                ctx.replyWithHTML(message, Keyboards.acceptIdea())
+            }
+            else {
+                let title = 'Новая идея';
+                let message = messageFormat.publishIdeaAdmin(idea[0], title, user[0].nickname,
+                    ctx.chat.username, ctx.wizard.state.contactData.comment, ctx.wizard.state.contactData.price);
+                ctx.replyWithHTML(message, Keyboards.acceptIdea())
+            }
             return ctx.wizard.next();
             }
     },
@@ -80,26 +90,34 @@ const adminAcceptWizard = new WizardScene(
             let statusResponse = response[0];
             let uuid = response[1];
             if (ctx.callbackQuery.data == 'ОК') {
-                let idea = await strategyController.getStrategyByUUID(uuid);
-                if (statusResponse == 'watchlist') {
-                    let messageAdmin = messageFormat.commentAdmin('WL', uuid, idea, ctx.chat.username, ctx.wizard.state.contactData.comment, ctx.wizard.state.contactData.price);
-                    await strategyController.updateStatusStrategy(uuid, 'WatchList');
-                    await strategyController.updateWatchListStrategy(uuid, true);
-                    let newIdea = await strategyController.updatePriceStrategy(uuid, ctx.wizard.state.contactData.price);
-                    let newComment = await strategyController.updatePriceComment(uuid, ctx.wizard.state.contactData.comment);
-                    await ctx.replyWithHTML(messageAdmin);
-                    if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin, {parse_mode: 'HTML'});
-                } else if (statusResponse == 'channel') {
-                    let messageAdmin = messageFormat.commentAdmin('Канал', uuid, idea, ctx.chat.username, ctx.wizard.state.contactData.comment, ctx.wizard.state.contactData.price);
-                    await strategyController.updateStatusStrategy(uuid, 'Канал');
-                    await strategyController.updateWatchListStrategy(uuid, true);
-                    let title = 'Новая идея';
-                    let newIdea = await strategyController.updatePriceStrategy(uuid, ctx.wizard.state.contactData.price);
-                    let newComment = await strategyController.updatePriceComment(uuid, ctx.wizard.state.contactData.comment);
-                    await generateMessage.publishIdea(ctx, newComment, title);
-                    await ctx.replyWithHTML(messageAdmin);
-                    if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin, {parse_mode: 'HTML'});
-                }
+                    let idea = await strategyController.getStrategyByUUID(uuid);
+                    if (idea[0].status == null) {
+                        if (statusResponse == 'watchlist') {
+                            let messageAdmin = messageFormat.commentAdmin('WatchList', uuid, idea, ctx.chat.username, ctx.wizard.state.contactData.comment, ctx.wizard.state.contactData.price);
+                            await strategyController.updateStatusStrategy(uuid, 'WatchList');
+                            await strategyController.updateWatchListStrategy(uuid, true);
+                            let title = 'Новая идея в WatchList';
+                            let newIdea = await strategyController.updatePriceStrategy(uuid, ctx.wizard.state.contactData.price);
+                            let newComment = await strategyController.insertPriceComment(uuid, ctx.wizard.state.contactData.comment);
+                            await generateMessage.publishIdea(ctx, newComment, title);
+                            await ctx.replyWithHTML(messageAdmin);
+                            if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin, {parse_mode: 'HTML'});
+                        } else if (statusResponse == 'channel') {
+                            let messageAdmin = messageFormat.commentAdmin('Канал', uuid, idea, ctx.chat.username, ctx.wizard.state.contactData.comment, ctx.wizard.state.contactData.price);
+                            await strategyController.updateStatusStrategy(uuid, 'Канал');
+                            await strategyController.updateWatchListStrategy(uuid, true);
+                            let title = 'Новая идея';
+                            let newIdea = await strategyController.updatePriceStrategy(uuid, ctx.wizard.state.contactData.price);
+                            let newComment = await strategyController.insertPriceComment(uuid, ctx.wizard.state.contactData.comment);
+                            console.log(newComment)
+                            await generateMessage.publishIdea(ctx, newComment, title);
+                            await ctx.replyWithHTML(messageAdmin);
+                            if (ctx.chat.id != idea[0].id_telegram) await bot.telegram.sendMessage(idea[0].id_telegram, messageAdmin, {parse_mode: 'HTML'});
+                        }
+                    }
+                    else {
+                        ctx.reply('Идея закрыта другим админом.')
+                    }
             } else if (ctx.callbackQuery.data == 'ОТМЕНА') {
                 ctx.reply('Оценка идеи отменена.')
             }

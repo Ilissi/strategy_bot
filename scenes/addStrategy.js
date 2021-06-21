@@ -286,8 +286,9 @@ const contactDataWizard = new WizardScene(
                     ctx.wizard.state.contactData.order, ctx.wizard.state.contactData.price_enter, ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL,
                     ctx.wizard.state.contactData.user_id, ctx.wizard.state.contactData.comment]
                 let response = await strategyController.createStrategy(record_list);
-                if (typeof response == 'undefined'){
+                if (response.severity == 'ERROR'){
                     ctx.reply('Ошибка формата текста! Сообщение не отправлено!')
+                    return ctx.scene.leave();
                 }
             else {
                 let messageSend = messageFormat.generate_message((response[0].id).toString(), ctx.callbackQuery.from.username, ctx.wizard.state.contactData.ticker,
