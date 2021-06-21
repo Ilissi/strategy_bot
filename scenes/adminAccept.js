@@ -36,7 +36,7 @@ const adminAcceptWizard = new WizardScene(
         }
         else {
             await ctx.reply('Ошибка ввода:');
-            return ctx.wizard.leave();
+            return ctx.scene.leave();
         }
     },
     async (ctx) => {
