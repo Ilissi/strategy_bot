@@ -48,6 +48,7 @@ const gradeDataWizard = new WizardScene(
                 let checkResponse = await gradeController.checkAccepted(ctx.wizard.state.contactData.UUID, ctx.wizard.state.contactData.userid);
                 if (checkResponse.length == 0) {
                     ctx.reply('Оцени Торговую идею:\nПортфель/Тикер/Торговый тезис', Keyboards.insertGrade());
+                    ctx.reply('Оцени Торговую идею:\nПортфель/Тикер/Торговый тезис', Keyboards.insertGrade());
                     return ctx.wizard.next();
                 } else {
                     ctx.reply('Вы уже оценили эту идею!');
