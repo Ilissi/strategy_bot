@@ -150,6 +150,8 @@ const returnGrades = async (ctx, idea_uuid) => {
             format_message.push(messageFormat.generatePrice(grades[i].price_entity));
             format_message.push(messageFormat.generateGrade('Оценка торговой идеи:', grades[i].first_criterion));
             format_message.push(messageFormat.generateGrade('Оценка точки входа:', grades[i].second_criterion));
+            format_message.push(messageFormat.generateString('Соответствие портфель:', grades[i].order))
+            format_message.push(messageFormat.generateString('Взял бы себе:', grades[i].portfolio))
         }
         let finishMessage = format_message.join('\n')
         let author_message = 'Идея отправлена администраторам.'
@@ -218,8 +220,8 @@ const returnUsers = async (ctx) =>{
 
 
 function checkDigitDiapason(message){
-    let digit = /^[0-9]*.[0-9]*$/;
-    let digitDiapazon = /^[0-9]*.[0-9]*-[0-9]*.[0-9]*$/
+    let digit = /^[0-9]*[.][0-9]*$/;
+    let digitDiapazon = /^[0-9]*[.][0-9]*-[0-9]*.[0-9]*$/
     try {
         if (digit.test(message) || digitDiapazon.test(message)){
             return true;
@@ -229,8 +231,9 @@ function checkDigitDiapason(message){
     catch (err){}
 }
 
+
 function checkDigit(message) {
-    let digit = /^[0-9]*.[0-9]*$/;
+    let digit = /^[0-9]*[.][0-9]*$/;
     try {
         if (message == '-'){
             return true;
