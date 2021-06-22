@@ -150,7 +150,7 @@ const returnGrades = async (ctx, idea_uuid) => {
             format_message.push(messageFormat.generatePrice(grades[i].price_entity));
             format_message.push(messageFormat.generateGrade('Оценка торговой идеи:', grades[i].first_criterion));
             format_message.push(messageFormat.generateGrade('Оценка точки входа:', grades[i].second_criterion));
-            format_message.push(messageFormat.generateString('Соответствие портфель:', grades[i].order))
+            format_message.push(messageFormat.generateString('Соответствие портфель:', messageFormat.acceptPortfolio(grades[i].order_type)))
             format_message.push(messageFormat.generateString('Взял бы себе:', grades[i].portfolio))
         }
         let finishMessage = format_message.join('\n')

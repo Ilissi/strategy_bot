@@ -116,6 +116,19 @@ function publishIdea(idea, title, username){
 }
 
 
+function acceptPortfolio(order_type){
+    let message;
+    if (order_type.includes('Сохранить')){
+        message = 'Да';
+
+    }
+    else {
+        message = 'Нет';
+    }
+    return message
+}
+
+
 function publishIdeaAdmin(idea, title, username, admin, commentAdmin, priceAdmin){
     let getFormat = returnFormat(idea.tp, idea.sl);
     return `<b>${title}</b>\n<b>№${PrefInt((idea.id).toString(), 4)}</b> @${username}\n💼 <a href="${idea.url}">${idea.ticker}</a>\n<b>🟢 Вход:</b> ${idea.entry_price}$\n<b>🟠 Цель:</b> ${getFormat.TP}\n<b>🔴 Стоп:</b> ${getFormat.SL}\n<b>Стратегия:</b> ${idea.type}\n<b>Тип:</b> ${idea.order_type}\n<b>Источник:</b> ${idea.source}\n<b>Комментарий:</b> ${idea.comment}\n<b>Цена входа администратора:</b> ${priceAdmin}\n<b>Администратор @${admin}:</b> ${commentAdmin} `;
@@ -139,5 +152,5 @@ function commentAdmin(place, uuid, idea, username, comment, price) {
 }
 
 
-module.exports = { generate_message, managerMessage, getTime, generateFinishMessage, generateStringSummary, PrefInt, generatePoint,
+module.exports = { generate_message, managerMessage, getTime, generateFinishMessage, generateStringSummary, PrefInt, generatePoint, acceptPortfolio,
     generateString, generateComment, publishIdea, searchIdea, showUser, publishIdeaAdmin, commentAdmin, generatePrice, generateGrade}
