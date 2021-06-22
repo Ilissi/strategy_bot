@@ -220,8 +220,8 @@ const returnUsers = async (ctx) =>{
 
 
 function checkDigitDiapason(message){
-    let digit = /^[0-9]*[.][0-9]*$/;
-    let digitDiapazon = /^[0-9]*[.][0-9]*-[0-9]*.[0-9]*$/
+    let digit = /^[0-9]*[.]?[0-9]*$/;
+    let digitDiapazon = /^[0-9]*[.]?[0-9]*-[0-9]*.[0-9]*$/
     try {
         if (digit.test(message) || digitDiapazon.test(message)){
             return true;
@@ -233,7 +233,7 @@ function checkDigitDiapason(message){
 
 
 function checkDigit(message) {
-    let digit = /^[0-9]*[.][0-9]*$/;
+    let digit = /^[0-9]*[.]?[0-9]*$/;
     try {
         if (message == '-'){
             return true;
