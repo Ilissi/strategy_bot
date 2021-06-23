@@ -37,7 +37,7 @@ bot.start(async (ctx) => {
     }
     else if(check_block.length == 1){
         await activityController.updateActivityRecord(ctx.chat.id);
-        await ctx.reply(`Привет, ${userFirstName}. Администратор октлонил Вашу регистрацию. `);
+        await ctx.reply(`Привет, ${userFirstName}. Администратор отклонил Вашу регистрацию. `);
     }
     else if (check_status.length > 0){
         await activityController.updateActivityRecord(ctx.chat.id);
