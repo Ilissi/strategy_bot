@@ -31,9 +31,10 @@ class strategyController {
         let response;
         try {
             response = await db.query('SELECT id, type, url, source, ticker, order_type, entry_price,' +
-                'TP, SL, id_telegram, comment, status, approved, comment_admin FROM strategy WHERE id = $1', [strategy_id]);
+                'TP, SL, id_telegram, comment, status, approved, comment_admin, nickname FROM strategy WHERE id = $1', [strategy_id]);
             return response.rows;
         } catch (error) {
+            console.log(error)
             return error;
         }
     }
@@ -96,8 +97,8 @@ class strategyController {
         try {
             console.log(call_json)
             response = await db.query('INSERT INTO strategy' +
-                '(parent_id, type, url, source, ticker, order_type, entry_price, TP, SL, id_telegram, comment, status, watchlist, comment_admin, approved, ts) ' +
-                `VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, true, to_timestamp(${Date.now()} / 1000.0)) RETURNING *`, call_json);
+                '(parent_id, type, url, source, ticker, order_type, entry_price, TP, SL, id_telegram, comment, status, watchlist, comment_admin, nickname, approved, ts) ' +
+                `VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, true, to_timestamp(${Date.now()} / 1000.0)) RETURNING *`, call_json);
             return response.rows;
         } catch (error) {
             return error;
