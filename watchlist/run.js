@@ -33,8 +33,6 @@ async function getYahooValue(tickerObject){
 
 
 async function buyOrder(yahooValue, ideaObject){
-    console.log(yahooValue)
-    console.log(ideaObject)
     if (ideaObject.tp <= yahooValue[ideaObject.ticker]){
         await alertBot.sendTP(ideaObject);
     }

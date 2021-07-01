@@ -25,7 +25,7 @@ function updateParameters(order_type, ideaObject){
     if (ideaObject == '-'){
         return ideaObject;
     }
-    else if (order_type == 'Buy'){
+    else if (order_type == 'Long'){
         let percentDown = 0.85;
         if (ideaObject.includes('-')){
             let diapason = updateDiapason(percentDown, ideaObject)
@@ -116,8 +116,10 @@ const publishWatchListWizard = new WizardScene(
             if (response[0] == 'average'){
                 let idea_value = ctx.wizard.state.contactData.ideaObject[0];
                 let newResponse = await strategyController.createAverageStrategy(Object.values(idea_value));
+                console.log(newResponse)
                 await strategyController.updateApprove(false, response[1]);
-                await strategyController.updateStatusStrategy('Канал', newResponse[0].id);
+                await strategyController.updateStatusStrategy(response[1], ctx.wizard.state.contactData.title);
+                await strategyController.updateStatusStrategy(newResponse[0].id, 'Канал');
                 let message = messageFormat.publishIdea(idea_value,
                     ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
                 await bot.telegram.sendMessage(process.env.GROUP_ID, message,{parse_mode: 'HTML'});
@@ -127,6 +129,7 @@ const publishWatchListWizard = new WizardScene(
                 let message = messageFormat.publishIdea(ctx.wizard.state.contactData.ideaObject[0],
                     ctx.wizard.state.contactData.title, ctx.wizard.state.contactData.username[0].nickname);
                 await bot.telegram.sendMessage(process.env.GROUP_ID, message, {parse_mode: 'HTML'});
+                await strategyController.updateStatusStrategy(response[1], ctx.wizard.state.contactData.title);
                 await strategyController.updateApprove(false, response[1]);
                 await ctx.reply('Сообщение отправлено в канал.')
             }

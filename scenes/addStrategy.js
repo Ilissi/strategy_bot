@@ -284,7 +284,7 @@ const contactDataWizard = new WizardScene(
                 ctx.deleteMessage()
                 let record_list = [ctx.wizard.state.contactData.type, ctx.wizard.state.contactData.url, ctx.wizard.state.contactData.source, ctx.wizard.state.contactData.ticker,
                     ctx.wizard.state.contactData.order, ctx.wizard.state.contactData.price_enter, ctx.wizard.state.contactData.TP, ctx.wizard.state.contactData.SL,
-                    ctx.wizard.state.contactData.user_id, ctx.wizard.state.contactData.comment]
+                    ctx.wizard.state.contactData.user_id, ctx.wizard.state.contactData.comment, ctx.chat.username]
                 let response = await strategyController.createStrategy(record_list);
                 if (response.severity == 'ERROR'){
                     ctx.reply('Ошибка формата текста! Сообщение не отправлено!')

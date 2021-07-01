@@ -61,9 +61,10 @@ class strategyController {
     async updateStatusStrategy(strategy_id, status){
         let response;
         try {
-            response = await db.query('UPDATE strategy SET status = $1, ts_update = to_timestamp(${Date.now()} / 1000.0) WHERE id = $2 RETURNING *', [status, strategy_id]);
+            response = await db.query(`UPDATE strategy SET status = $1, ts_update = to_timestamp(${Date.now()} / 1000.0) WHERE id = $2 RETURNING *`, [status, strategy_id]);
             return response.rows;
         }catch (error) {
+            console.log(error)
             return error;
         }
     }
@@ -93,9 +94,10 @@ class strategyController {
     async createAverageStrategy(call_json) {
         let response;
         try {
+            console.log(call_json)
             response = await db.query('INSERT INTO strategy' +
-                '(type, source, ticker, order_type, entry_price, TP, SL, id_telegram, comment, ts, status, approved, watchlist) ' +
-                `VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, to_timestamp(${Date.now()} / 1000.0), $13, $14, true) RETURNING *`, call_json);
+                '(parent_id, type, url, source, ticker, order_type, entry_price, TP, SL, id_telegram, comment, status, watchlist, comment_admin, approved, ts) ' +
+                `VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, true, to_timestamp(${Date.now()} / 1000.0)) RETURNING *`, call_json);
             return response.rows;
         } catch (error) {
             return error;
