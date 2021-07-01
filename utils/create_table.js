@@ -22,13 +22,16 @@ async function createDatabase(){
             "entry_price VARCHAR(255) NOT NULL, " +
             "TP VARCHAR(255) NOT NULL, " +
             "SL VARCHAR(255) NOT NULL,  " +
-            "id_telegram INTEGER NOT NULL," +
+            "id_telegram INTEGER REFERENCES users(id_telegram) ON DELETE CASCADE," +
+            "nickname VARCHAR(255), " +
             "comment VARCHAR(2048) NOT NULL, " +
             "ts TIMESTAMP NOT NULL, " +
+            "ts_update TIMESTAMP, " +
             "status VARCHAR(255), " +
             "approved BOOLEAN," +
             "watchlist BOOLEAN," +
-            "comment_admin VARCHAR(2048));",
+            "comment_admin VARCHAR(2048)," +
+            "parent_id INTEGER);",
             (err, res) => {
                 console.log(err, res);
             });

@@ -7,10 +7,11 @@ class strategyController {
         let response;
         try {
         response = await db.query('INSERT INTO strategy' +
-            '(type, url, source, ticker, order_type, entry_price, TP, SL, id_telegram, comment, ts) ' +
-            `VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, to_timestamp(${Date.now()} / 1000.0)) RETURNING *`, call_json);
+            '(type, url, source, ticker, order_type, entry_price, TP, SL, id_telegram, comment, nickname, ts) ' +
+            `VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, to_timestamp(${Date.now()} / 1000.0)) RETURNING *`, call_json);
         return response.rows;
     } catch (error) {
+            console.log(error)
             return error;
         }
     }
@@ -60,7 +61,7 @@ class strategyController {
     async updateStatusStrategy(strategy_id, status){
         let response;
         try {
-            response = await db.query('UPDATE strategy SET status = $1 WHERE id = $2 RETURNING *', [status, strategy_id]);
+            response = await db.query('UPDATE strategy SET status = $1, ts_update = to_timestamp(${Date.now()} / 1000.0) WHERE id = $2 RETURNING *', [status, strategy_id]);
             return response.rows;
         }catch (error) {
             return error;
